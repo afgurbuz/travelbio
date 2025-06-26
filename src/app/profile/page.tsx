@@ -279,11 +279,72 @@ export default function ProfilePage() {
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Select country</option>
-                      {countries.map(country => (
-                        <option key={country.id} value={country.id}>
-                          {country.flag} {country.name}
-                        </option>
-                      ))}
+                      
+                      {/* Popular Countries */}
+                      <optgroup label="🌟 Popular">
+                        {countries.filter(c => ['US', 'GB', 'DE', 'FR', 'IT', 'ES', 'JP', 'AU', 'CA', 'TR'].includes(c.code))
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={country.id} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      
+                      {/* Europe */}
+                      <optgroup label="🇪🇺 Europe">
+                        {countries.filter(c => ['AT', 'BE', 'BG', 'HR', 'CZ', 'DK', 'EE', 'FI', 'GR', 'HU', 'IE', 'IS', 'LV', 'LT', 'NL', 'NO', 'PL', 'PT', 'RO', 'SK', 'SI', 'SE', 'CH'].includes(c.code))
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={country.id} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      
+                      {/* Asia */}
+                      <optgroup label="🌏 Asia">
+                        {countries.filter(c => ['CN', 'IN', 'KR', 'TH', 'SG', 'MY', 'VN', 'PH', 'ID', 'AE'].includes(c.code))
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={country.id} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      
+                      {/* Americas */}
+                      <optgroup label="🌎 Americas">
+                        {countries.filter(c => ['BR', 'MX', 'AR'].includes(c.code))
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={country.id} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      
+                      {/* Africa & Others */}
+                      <optgroup label="🌍 Africa & Others">
+                        {countries.filter(c => ['ZA', 'EG', 'NZ', 'RU'].includes(c.code))
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={country.id} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      
+                      {/* All Countries (Alphabetical) */}
+                      <optgroup label="🔤 All Countries">
+                        {countries
+                          .sort((a, b) => a.name.localeCompare(b.name))
+                          .map(country => (
+                            <option key={`all-${country.id}`} value={country.id}>
+                              {country.flag} {country.name}
+                            </option>
+                          ))}
+                      </optgroup>
                     </select>
                   </div>
                   <div>
