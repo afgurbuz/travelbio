@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink } from 'lucide-react'
+import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, FileText } from 'lucide-react'
 
 interface Profile {
   id: string
@@ -51,6 +51,10 @@ export default function ProfilePage() {
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
   const [locationType, setLocationType] = useState<'lived' | 'visited'>('visited')
+  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [editFullName, setEditFullName] = useState('')
+  const [editBio, setEditBio] = useState('')
+  const [editAvatarUrl, setEditAvatarUrl] = useState('')
 
   useEffect(() => {
     const loadData = async () => {
@@ -68,7 +72,12 @@ export default function ProfilePage() {
         .eq('id', user.id)
         .single()
       
-      if (profileData) setProfile(profileData)
+      if (profileData) {
+        setProfile(profileData)
+        setEditFullName(profileData.full_name || '')
+        setEditBio(profileData.bio || '')
+        setEditAvatarUrl(profileData.avatar_url || '')
+      }
 
       // Load countries
       const { data: countriesData } = await supabase
@@ -135,6 +144,43 @@ export default function ProfilePage() {
     } else {
       navigator.clipboard.writeText(profileUrl)
       alert('Profile link copied to clipboard!')
+    }
+  }
+
+  const handleUpdateProfile = async () => {
+    if (!user || !profile) return
+    
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: editFullName.trim() || null,
+          bio: editBio.trim() || null,
+          avatar_url: editAvatarUrl.trim() || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+      
+      if (!error) {
+        // Update local state
+        setProfile(prev => prev ? {
+          ...prev,
+          full_name: editFullName.trim() || undefined,
+          bio: editBio.trim() || undefined,
+          avatar_url: editAvatarUrl.trim() || undefined
+        } : null)
+        
+        setShowEditProfile(false)
+        alert('Profile updated successfully!')
+      } else {
+        alert('Error updating profile: ' + error.message)
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      alert('Error updating profile')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -206,19 +252,46 @@ export default function ProfilePage() {
         <div className="animate-fade-in">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-sky-100 dark:bg-sky-900/20 rounded-2xl">
-              <UserIcon className="w-8 h-8 text-sky-500" />
+            <div className="relative inline-block mb-4">
+              {profile?.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt={profile.username}
+                  className="w-24 h-24 rounded-3xl object-cover border-4 border-white dark:border-gray-800 shadow-xl"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+                  {profile?.username?.charAt(0).toUpperCase() || '?'}
+                </div>
+              )}
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              {profile?.username || 'Your Profile'}
+              {profile?.full_name || profile?.username || 'Your Profile'}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {profile?.full_name && (
+              <p className="text-lg text-gray-600 dark:text-gray-400 mb-1">
+                @{profile?.username}
+              </p>
+            )}
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
               {profile?.email}
             </p>
-            <div className="flex justify-center space-x-3">
+            {profile?.bio && (
+              <p className="text-gray-700 dark:text-gray-300 max-w-md mx-auto mb-4">
+                {profile.bio}
+              </p>
+            )}
+            <div className="flex justify-center space-x-3 mb-4">
+              <button
+                onClick={() => setShowEditProfile(true)}
+                className="inline-flex items-center px-4 py-2 bg-indigo-500 text-white rounded-xl font-semibold hover:bg-indigo-600 transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <Edit3 className="w-4 h-4 mr-2" />
+                Edit Profile
+              </button>
               <button
                 onClick={handleShare}
-                className="inline-flex items-center px-4 py-2 bg-sky-500 text-white rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-sky-500 text-white rounded-xl font-semibold hover:bg-sky-600 transition-all duration-300 hover:-translate-y-0.5"
               >
                 <Share2 className="w-4 h-4 mr-2" />
                 Share Profile
@@ -228,7 +301,7 @@ export default function ProfilePage() {
                   href={`/${profile.username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Public
@@ -236,6 +309,136 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+
+          {/* Edit Profile Modal */}
+          {showEditProfile && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl p-8 w-full max-w-md border border-gray-200 dark:border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
+                  <button
+                    onClick={() => setShowEditProfile(false)}
+                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* Avatar URL */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
+                      <Camera className="w-4 h-4 inline mr-2" />
+                      Avatar URL
+                    </label>
+                    <input
+                      type="url"
+                      value={editAvatarUrl}
+                      onChange={(e) => setEditAvatarUrl(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      placeholder="https://example.com/your-photo.jpg"
+                    />
+                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                      Enter a URL to your profile photo
+                    </p>
+                  </div>
+
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
+                      <UserIcon className="w-4 h-4 inline mr-2" />
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={editFullName}
+                      onChange={(e) => setEditFullName(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      placeholder="Your full name"
+                      maxLength={100}
+                    />
+                  </div>
+
+                  {/* Bio */}
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
+                      <FileText className="w-4 h-4 inline mr-2" />
+                      Bio
+                    </label>
+                    <textarea
+                      value={editBio}
+                      onChange={(e) => setEditBio(e.target.value)}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+                      placeholder="Tell the world about your travel passion..."
+                      maxLength={500}
+                    />
+                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                      {editBio.length}/500 characters
+                    </p>
+                  </div>
+
+                  {/* Preview */}
+                  {(editAvatarUrl || editFullName || editBio) && (
+                    <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Preview:</p>
+                      <div className="text-center">
+                        {editAvatarUrl ? (
+                          <img 
+                            src={editAvatarUrl} 
+                            alt="Preview"
+                            className="w-16 h-16 rounded-2xl object-cover mx-auto mb-2"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
+                        ) : (
+                          <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold mx-auto mb-2">
+                            {editFullName?.charAt(0) || profile?.username?.charAt(0) || '?'}
+                          </div>
+                        )}
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                          {editFullName || profile?.username}
+                        </h3>
+                        {editBio && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {editBio}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Buttons */}
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      onClick={() => setShowEditProfile(false)}
+                      className="flex-1 px-4 py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleUpdateProfile}
+                      disabled={saving}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    >
+                      {saving ? (
+                        <span className="flex items-center justify-center">
+                          <div className="spinner mr-2"></div>
+                          Saving...
+                        </span>
+                      ) : (
+                        <span className="flex items-center justify-center">
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Changes
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Locations Section */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 mb-6">
