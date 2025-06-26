@@ -21,7 +21,7 @@ export default function SignUpPage() {
     setError('')
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -32,6 +32,21 @@ export default function SignUpPage() {
       })
       
       if (error) throw error
+      
+      // Create profile manually if user is created
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            username,
+            email,
+          })
+        
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+        }
+      }
       
       setSuccess(true)
     } catch (error: any) {
