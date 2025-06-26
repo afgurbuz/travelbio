@@ -153,23 +153,36 @@ export default function PublicProfilePage({ params }: PageProps) {
         <div className="animate-fade-in">
           {/* Profile Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gradient-to-br from-sky-400 to-blue-500 rounded-full text-white text-2xl font-bold">
-              {profile.username.charAt(0).toUpperCase()}
+            <div className="relative inline-block mb-6">
+              {profile.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  alt={profile.username}
+                  className="w-32 h-32 rounded-3xl object-cover border-4 border-white dark:border-gray-800 shadow-2xl"
+                />
+              ) : (
+                <div className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl font-bold shadow-2xl">
+                  {profile.username.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full border-4 border-white dark:border-gray-900 flex items-center justify-center">
+                <span className="text-white text-sm">✓</span>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
               {profile.full_name || profile.username}
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-2xl text-gray-600 dark:text-gray-400 mb-4">
               @{profile.username}
             </p>
             {profile.bio && (
-              <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-4">
+              <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto mb-6 leading-relaxed">
                 {profile.bio}
               </p>
             )}
-            <div className="flex items-center justify-center space-x-1 text-sm text-gray-500 dark:text-gray-400">
-              <Calendar className="w-4 h-4" />
-              <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
+            <div className="flex items-center justify-center space-x-2 text-gray-500 dark:text-gray-400">
+              <Calendar className="w-5 h-5" />
+              <span className="text-lg">Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
             </div>
           </div>
 
