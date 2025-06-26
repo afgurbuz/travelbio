@@ -78,7 +78,7 @@ export default function DiscoverPage() {
 
             const locationCount = locationsData?.length || 0
             const countriesCount = locationsData 
-              ? new Set(locationsData.map(l => l.country_id)).size 
+              ? new Set(locationsData.map((l: any) => l.country_id)).size 
               : 0
 
             return {
