@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Profile } from '@/types'
+import { Profile, Country } from '@/types'
 import { getCountryByCode } from '@/lib/countries'
 import ProfileCard from '@/components/ProfileCard'
 
@@ -32,18 +32,18 @@ export default function DiscoverPage() {
       if (countriesError) throw countriesError
 
       // Combine data
-      const combinedProfiles: Profile[] = profilesData.map(profile => {
-        const userCountries = userCountriesData.filter(uc => uc.user_id === profile.id)
+      const combinedProfiles: Profile[] = profilesData.map((profile: any) => {
+        const userCountries = userCountriesData.filter((uc: any) => uc.user_id === profile.id)
         
         const lived_countries = userCountries
-          .filter(uc => uc.type === 'lived')
-          .map(uc => getCountryByCode(uc.country_code))
-          .filter(Boolean)
+          .filter((uc: any) => uc.type === 'lived')
+          .map((uc: any) => getCountryByCode(uc.country_code))
+          .filter(Boolean) as Country[]
 
         const visited_countries = userCountries
-          .filter(uc => uc.type === 'visited')
-          .map(uc => getCountryByCode(uc.country_code))
-          .filter(Boolean)
+          .filter((uc: any) => uc.type === 'visited')
+          .map((uc: any) => getCountryByCode(uc.country_code))
+          .filter(Boolean) as Country[]
 
         return {
           user: {

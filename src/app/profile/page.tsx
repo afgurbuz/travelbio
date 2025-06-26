@@ -45,7 +45,7 @@ export default function ProfilePage() {
     const lived: Country[] = []
     const visited: Country[] = []
 
-    data.forEach(item => {
+    data.forEach((item: any) => {
       const country = getCountryByCode(item.country_code)
       if (country) {
         if (item.type === 'lived') {

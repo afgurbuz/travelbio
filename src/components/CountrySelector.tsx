@@ -78,7 +78,7 @@ export default function CountrySelector({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-64 overflow-y-auto">
         {filteredCountries.map(country => {
           const isSelected = selectedCountries.some(c => c.code === country.code)
-          const isDisabled = maxSelection && selectedCountries.length >= maxSelection && !isSelected
+          const isDisabled = !!(maxSelection && selectedCountries.length >= maxSelection && !isSelected)
           
           return (
             <button
