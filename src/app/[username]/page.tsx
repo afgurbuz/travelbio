@@ -129,8 +129,6 @@ export default function PublicProfilePage({ params }: PageProps) {
 
   const livedLocations = userLocations.filter(loc => loc.type === 'lived')
   const visitedLocations = userLocations.filter(loc => loc.type === 'visited')
-  const totalCountries = new Set(userLocations.map(loc => loc.country_id)).size
-  const totalCities = userLocations.filter(loc => loc.city).length
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
@@ -201,33 +199,6 @@ export default function PublicProfilePage({ params }: PageProps) {
             </CardContent>
           </Card>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            <Card className="text-center hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCountries}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Countries</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCities}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Cities</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{livedLocations.length}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Lived</div>
-              </CardContent>
-            </Card>
-            <Card className="text-center hover:shadow-md transition-shadow">
-              <CardContent className="pt-6">
-                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{visitedLocations.length}</div>
-                <div className="text-sm text-slate-600 dark:text-slate-400">Visited</div>
-              </CardContent>
-            </Card>
-          </div>
 
           {userLocations.length === 0 ? (
             <Card className="text-center py-16">
