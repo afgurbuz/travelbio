@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Compass, User, LogOut, Globe } from 'lucide-react'
 import { User as SupabaseUser } from '@supabase/supabase-js'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 interface NavigationProps {
   user: SupabaseUser | null
@@ -19,39 +21,39 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
   ]
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/discover" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center">
-              <Globe className="w-5 h-5 text-white dark:text-slate-900" />
+          <Link href="/discover" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+              <Globe className="w-6 h-6 text-white dark:text-slate-900" />
             </div>
-            <span className="text-xl font-bold text-slate-900 dark:text-white">
+            <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
               TravelBio
             </span>
           </Link>
 
           {/* Navigation */}
           {user && (
-            <nav className="hidden md:flex items-center space-x-1">
+            <nav className="hidden md:flex items-center space-x-2">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
                 const Icon = item.icon
                 
                 return (
-                  <Link
+                  <Button
                     key={item.href}
-                    href={item.href}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-900'
-                    }`}
+                    asChild
+                    variant={isActive ? "default" : "ghost"}
+                    size="sm"
+                    className="h-9"
                   >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
+                    <Link href={item.href} className="flex items-center space-x-2">
+                      <Icon className="w-4 h-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  </Button>
                 )
               })}
             </nav>
@@ -60,21 +62,23 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
           {/* User Menu */}
           <div className="flex items-center space-x-3">
             {user ? (
-              <button
+              <Button
                 onClick={onSignOut}
-                className="flex items-center space-x-2 px-3 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg text-sm font-medium transition-colors"
+                variant="ghost"
+                size="sm"
+                className="h-9"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-4 h-4 mr-2" />
                 <span className="hidden sm:inline">Sign Out</span>
-              </button>
+              </Button>
             ) : (
-              <div className="flex items-center space-x-3">
-                <Link href="/auth/signin" className="btn-ghost">
-                  Sign In
-                </Link>
-                <Link href="/auth/signup" className="btn-primary">
-                  Sign Up
-                </Link>
+              <div className="flex items-center space-x-2">
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/auth/signin">Sign In</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/auth/signup">Sign Up</Link>
+                </Button>
               </div>
             )}
           </div>
@@ -82,25 +86,24 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
 
         {/* Mobile Navigation */}
         {user && (
-          <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-            <div className="grid grid-cols-2 gap-1 p-2">
+          <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50">
+            <div className="grid grid-cols-2 gap-2 p-3">
               {navItems.map((item) => {
                 const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
                 const Icon = item.icon
                 
                 return (
-                  <Link
+                  <Button
                     key={item.href}
-                    href={item.href}
-                    className={`flex flex-col items-center justify-center py-3 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
+                    asChild
+                    variant={isActive ? "default" : "ghost"}
+                    className="h-12 flex-col space-y-1"
                   >
-                    <Icon className="w-5 h-5 mb-1" />
-                    <span className="text-xs font-medium">{item.label}</span>
-                  </Link>
+                    <Link href={item.href}>
+                      <Icon className="w-5 h-5" />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </Link>
+                  </Button>
                 )
               })}
             </div>

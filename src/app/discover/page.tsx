@@ -5,8 +5,12 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { Shuffle, MapPin, Globe, Users } from 'lucide-react'
+import { Shuffle, MapPin, Globe, Users, Sparkles } from 'lucide-react'
 import Link from 'next/link'
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 
 interface Profile {
   id: string
@@ -124,119 +128,138 @@ export default function DiscoverPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="w-16 h-16 bg-slate-900 dark:bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Globe className="w-8 h-8 text-white dark:text-slate-900" />
+            <div className="text-center mb-16">
+              <div className="relative mx-auto mb-8">
+                <div className="w-20 h-20 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
+                  <Sparkles className="w-10 h-10 text-white dark:text-slate-900" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full animate-pulse"></div>
               </div>
-              <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-6">
                 Discover Travelers
               </h1>
-              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8">
-                Explore travel stories from around the world and get inspired for your next adventure.
+              
+              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
+                Explore travel stories from around the world and get inspired for your next adventure. 
+                Connect with fellow explorers and discover hidden gems.
               </p>
               
-              <button
+              <Button
                 onClick={handleShuffle}
                 disabled={shuffling}
-                className="btn-primary px-6 py-3"
+                size="lg"
+                className="px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <Shuffle className="w-5 h-5 mr-2" />
-                {shuffling ? 'Shuffling...' : 'Shuffle Profiles'}
-              </button>
+                {shuffling ? 'Finding new travelers...' : 'Discover New Travelers'}
+              </Button>
             </div>
 
             {/* Profiles Grid */}
             {profiles.length === 0 ? (
-              <div className="text-center py-16">
-                <Users className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                  No travelers found
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-8">
-                  Be the first to add your travel experiences!
-                </p>
-                {user && (
-                  <Link href="/profile" className="btn-primary">
-                    Add Your Travels
-                  </Link>
-                )}
-                {!user && (
-                  <Link href="/auth/signup" className="btn-primary">
-                    Join TravelBio
-                  </Link>
-                )}
-              </div>
+              <Card className="max-w-md mx-auto p-8 text-center border-dashed">
+                <CardContent className="pt-6">
+                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                    No travelers found
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400 mb-6">
+                    Be the first to add your travel experiences!
+                  </p>
+                  {user ? (
+                    <Button asChild>
+                      <Link href="/profile">Add Your Travels</Link>
+                    </Button>
+                  ) : (
+                    <Button asChild>
+                      <Link href="/auth/signup">Join TravelBio</Link>
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {profiles.map((profile) => (
-                  <Link 
-                    key={profile.id} 
-                    href={`/${profile.username}`}
-                    className="card hover-lift group"
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {profiles.map((profile, index) => (
+                  <Card 
+                    key={profile.id}
+                    className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md"
+                    style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <div className="text-center">
-                      {/* Avatar */}
-                      <div className="relative inline-block mb-4">
-                        {profile.avatar_url ? (
-                          <img 
-                            src={profile.avatar_url} 
-                            alt={profile.username}
-                            className="w-20 h-20 rounded-2xl object-cover border border-slate-200 dark:border-slate-800"
-                          />
-                        ) : (
-                          <div className="w-20 h-20 bg-slate-900 dark:bg-slate-100 rounded-2xl flex items-center justify-center text-white dark:text-slate-900 text-2xl font-bold">
-                            {profile.username.charAt(0).toUpperCase()}
+                    <CardContent className="p-6">
+                      <Link href={`/${profile.username}`} className="block">
+                        <div className="text-center space-y-4">
+                          {/* Avatar */}
+                          <div className="relative mx-auto w-fit">
+                            <Avatar className="w-16 h-16 border-2 border-white shadow-md">
+                              <AvatarImage 
+                                src={profile.avatar_url || undefined} 
+                                alt={profile.username}
+                                className="object-cover"
+                              />
+                              <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-lg font-bold">
+                                {profile.username.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
                           </div>
-                        )}
-                      </div>
-                      
-                      {/* Name */}
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
-                        {profile.full_name || profile.username}
-                      </h3>
-                      
-                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-3">
-                        @{profile.username}
-                      </p>
-                      
-                      {/* Bio */}
-                      {profile.bio && (
-                        <p className="text-slate-700 dark:text-slate-300 text-sm mb-4 line-clamp-2">
-                          {profile.bio}
-                        </p>
-                      )}
-                      
-                      {/* Stats */}
-                      <div className="flex justify-center space-x-4 text-sm">
-                        <div className="flex items-center text-slate-600 dark:text-slate-400">
-                          <Globe className="w-4 h-4 mr-1" />
-                          <span>{profile.countries_count} countries</span>
+                          
+                          {/* Name & Username */}
+                          <div>
+                            <h3 className="font-semibold text-slate-900 dark:text-white text-lg mb-1">
+                              {profile.full_name || profile.username}
+                            </h3>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm">
+                              @{profile.username}
+                            </p>
+                          </div>
+                          
+                          {/* Bio */}
+                          {profile.bio && (
+                            <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 px-2">
+                              {profile.bio}
+                            </p>
+                          )}
+                          
+                          {/* Stats */}
+                          <div className="flex justify-center gap-3">
+                            <Badge variant="secondary" className="flex items-center gap-1">
+                              <Globe className="w-3 h-3" />
+                              {profile.countries_count}
+                            </Badge>
+                            <Badge variant="secondary" className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {profile.location_count}
+                            </Badge>
+                          </div>
                         </div>
-                        <div className="flex items-center text-slate-600 dark:text-slate-400">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          <span>{profile.location_count} places</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                      </Link>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
             )}
 
             {/* Bottom CTA */}
             {!user && profiles.length > 0 && (
-              <div className="text-center mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-                  Ready to share your story?
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-6">
-                  Join TravelBio and create your own travel profile.
-                </p>
-                <Link href="/auth/signup" className="btn-primary px-8 py-3 text-lg">
-                  <Globe className="w-5 h-5 mr-2" />
-                  Get Started
-                </Link>
-              </div>
+              <Card className="mt-16 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-0">
+                <CardContent className="text-center py-12">
+                  <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                    Ready to share your story?
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg max-w-md mx-auto">
+                    Join TravelBio and create your own travel profile to connect with fellow explorers.
+                  </p>
+                  <Button asChild size="lg" className="px-8 py-3 text-lg">
+                    <Link href="/auth/signup">
+                      <Globe className="w-5 h-5 mr-2" />
+                      Start Your Journey
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
