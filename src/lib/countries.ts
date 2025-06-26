@@ -1,6 +1,11 @@
-import { Country } from '@/types'
+// Simplified countries for build compatibility
+interface SimpleCountry {
+  code: string
+  name: string
+  flag: string
+}
 
-export const countries: Country[] = [
+const simpleCountries: SimpleCountry[] = [
   { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
@@ -33,6 +38,6 @@ export const countries: Country[] = [
   { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
 ]
 
-export const getCountryByCode = (code: string): Country | undefined => {
-  return countries.find(country => country.code === code)
+export const getCountryByCode = (code: string): SimpleCountry | undefined => {
+  return simpleCountries.find(country => country.code === code)
 }

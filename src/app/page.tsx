@@ -204,12 +204,3 @@ export default function HomePage() {
     </>
   )
 }
-
-<style jsx>{`
-  .bg-grid-pattern {
-    background-image: 
-      linear-gradient(to right, rgba(148, 163, 184, 0.1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
-`}</style>

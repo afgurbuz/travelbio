@@ -2,106 +2,81 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Profile, Country } from '@/types'
-import { getCountryByCode } from '@/lib/countries'
-import ProfileCard from '@/components/ProfileCard'
+import Navigation from '@/components/Navigation'
+import { User } from '@supabase/supabase-js'
+import { Users, MapPin } from 'lucide-react'
 
 export default function DiscoverPage() {
-  const [profiles, setProfiles] = useState<Profile[]>([])
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadProfiles()
-  }, [])
-
-  const loadProfiles = async () => {
-    try {
-      // Get profiles with their countries
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .limit(20)
-
-      if (profilesError) throw profilesError
-
-      // Get user countries for all profiles
-      const { data: userCountriesData, error: countriesError } = await supabase
-        .from('user_countries')
-        .select('*')
-
-      if (countriesError) throw countriesError
-
-      // Combine data
-      const combinedProfiles: Profile[] = profilesData.map((profile: any) => {
-        const userCountries = userCountriesData.filter((uc: any) => uc.user_id === profile.id)
-        
-        const lived_countries = userCountries
-          .filter((uc: any) => uc.type === 'lived')
-          .map((uc: any) => getCountryByCode(uc.country_code))
-          .filter(Boolean) as Country[]
-
-        const visited_countries = userCountries
-          .filter((uc: any) => uc.type === 'visited')
-          .map((uc: any) => getCountryByCode(uc.country_code))
-          .filter(Boolean) as Country[]
-
-        return {
-          user: {
-            id: profile.id,
-            email: profile.username + '@example.com', // We don't have email in profiles
-            username: profile.username,
-            full_name: profile.full_name,
-            avatar_url: profile.avatar_url,
-            bio: profile.bio,
-            created_at: profile.created_at
-          },
-          lived_countries,
-          visited_countries
-        }
-      })
-
-      // Filter out profiles with no travel data
-      const profilesWithData = combinedProfiles.filter(
-        profile => profile.lived_countries.length > 0 || profile.visited_countries.length > 0
-      )
-
-      setProfiles(profilesWithData)
-    } catch (error) {
-      console.error('Error loading profiles:', error)
-    } finally {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
       setLoading(false)
     }
+
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event: any, session: any) => {
+        setUser(session?.user ?? null)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
   }
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-xl text-gray-600">Loading profiles...</div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="spinner"></div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">Discover Travelers</h2>
-        <p className="text-gray-600">
-          Explore profiles from fellow travelers around the world
-        </p>
-      </div>
+    <>
+      <Navigation user={user} onSignOut={handleSignOut} />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+        <div className="animate-fade-in">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 bg-purple-100 dark:bg-purple-900/20 rounded-2xl">
+              <Users className="w-8 h-8 text-purple-500" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Discover Travelers
+            </h1>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              Connect with fellow travelers and explore their amazing journeys around the world
+            </p>
+          </div>
 
-      {profiles.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg mb-4">No profiles found yet</p>
-          <p className="text-gray-500">Be the first to set up your travel profile!</p>
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-gray-100 dark:bg-gray-800 rounded-full">
+              <MapPin className="w-10 h-10 text-gray-400" />
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+              Coming Soon!
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+              We're working hard to bring you an amazing way to discover other travelers. 
+              Start by setting up your own profile!
+            </p>
+            <a
+              href="/profile"
+              className="inline-flex items-center px-6 py-3 bg-sky-500 text-white rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+            >
+              Set Up My Profile
+            </a>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {profiles.map(profile => (
-            <ProfileCard key={profile.user.id} profile={profile} />
-          ))}
-        </div>
-      )}
-    </div>
+      </main>
+    </>
   )
 }
