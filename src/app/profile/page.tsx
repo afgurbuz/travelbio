@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, FileText } from 'lucide-react'
+import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, FileText, Upload, Image as ImageIcon } from 'lucide-react'
 
 interface Profile {
   id: string
@@ -55,6 +55,8 @@ export default function ProfilePage() {
   const [editFullName, setEditFullName] = useState('')
   const [editBio, setEditBio] = useState('')
   const [editAvatarUrl, setEditAvatarUrl] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -147,17 +149,92 @@ export default function ProfilePage() {
     }
   }
 
+  const uploadAvatar = async (file: File): Promise<string | null> => {
+    if (!user) return null
+
+    try {
+      setUploading(true)
+      
+      // Create unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `avatars/${fileName}`
+
+      // Upload file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) {
+        throw uploadError
+      }
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath)
+
+      return data.publicUrl
+    } catch (error) {
+      console.error('Error uploading avatar:', error)
+      alert('Error uploading image. Please try again.')
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size must be less than 5MB')
+      return
+    }
+
+    setAvatarFile(file)
+    
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file)
+    setEditAvatarUrl(previewUrl)
+  }
+
   const handleUpdateProfile = async () => {
     if (!user || !profile) return
     
     setSaving(true)
     try {
+      let finalAvatarUrl = editAvatarUrl
+
+      // Upload new avatar if file is selected
+      if (avatarFile) {
+        const uploadedUrl = await uploadAvatar(avatarFile)
+        if (uploadedUrl) {
+          finalAvatarUrl = uploadedUrl
+        } else {
+          // If upload failed, don't proceed
+          setSaving(false)
+          return
+        }
+      }
+
       const { error } = await supabase
         .from('profiles')
         .update({
           full_name: editFullName.trim() || null,
           bio: editBio.trim() || null,
-          avatar_url: editAvatarUrl.trim() || null,
+          avatar_url: finalAvatarUrl.trim() || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
@@ -168,8 +245,14 @@ export default function ProfilePage() {
           ...prev,
           full_name: editFullName.trim() || undefined,
           bio: editBio.trim() || undefined,
-          avatar_url: editAvatarUrl.trim() || undefined
+          avatar_url: finalAvatarUrl.trim() || undefined
         } : null)
+        
+        // Clean up
+        setAvatarFile(null)
+        if (editAvatarUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(editAvatarUrl)
+        }
         
         setShowEditProfile(false)
         alert('Profile updated successfully!')
@@ -325,22 +408,76 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="space-y-6">
-                  {/* Avatar URL */}
+                  {/* Avatar Upload */}
                   <div>
                     <label className="block text-sm font-bold text-gray-800 dark:text-gray-200 mb-3">
                       <Camera className="w-4 h-4 inline mr-2" />
-                      Avatar URL
+                      Profile Photo
                     </label>
+                    
+                    {/* Current/Preview Avatar */}
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className="relative">
+                        {editAvatarUrl ? (
+                          <img 
+                            src={editAvatarUrl} 
+                            alt="Avatar preview"
+                            className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-200 dark:border-gray-700"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
+                            {editFullName?.charAt(0) || profile?.username?.charAt(0) || '?'}
+                          </div>
+                        )}
+                        {uploading && (
+                          <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center">
+                            <div className="spinner"></div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                          id="avatar-upload"
+                          disabled={uploading}
+                        />
+                        <label
+                          htmlFor="avatar-upload"
+                          className="inline-flex items-center px-4 py-2 bg-indigo-500 text-white rounded-xl font-semibold hover:bg-indigo-600 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          <Upload className="w-4 h-4 mr-2" />
+                          {uploading ? 'Uploading...' : 'Upload Photo'}
+                        </label>
+                        <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                          JPG, PNG or GIF (max 5MB)
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Or URL Input */}
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+                      </div>
+                      <div className="relative flex justify-center text-sm">
+                        <span className="px-2 bg-white dark:bg-gray-900 text-gray-500">or use URL</span>
+                      </div>
+                    </div>
+                    
                     <input
                       type="url"
-                      value={editAvatarUrl}
-                      onChange={(e) => setEditAvatarUrl(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                      value={avatarFile ? '' : editAvatarUrl}
+                      onChange={(e) => {
+                        setAvatarFile(null)
+                        setEditAvatarUrl(e.target.value)
+                      }}
+                      disabled={!!avatarFile}
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50"
                       placeholder="https://example.com/your-photo.jpg"
                     />
-                    <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                      Enter a URL to your profile photo
-                    </p>
                   </div>
 
                   {/* Full Name */}
