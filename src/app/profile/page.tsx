@@ -62,7 +62,7 @@ export default function ProfilePage() {
     const loadData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        router.push('/')
+        router.push('/discover')
         return
       }
       setUser(user)

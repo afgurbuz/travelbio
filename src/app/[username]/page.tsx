@@ -133,7 +133,7 @@ export default function PublicProfilePage({ params }: PageProps) {
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/discover" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center">
                 <Globe className="w-5 h-5 text-white dark:text-slate-900" />
               </div>

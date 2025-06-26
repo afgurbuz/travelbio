@@ -14,7 +14,6 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/', icon: Home, label: 'Home' },
     { href: '/discover', icon: Compass, label: 'Discover' },
     { href: '/profile', icon: User, label: 'Profile' },
   ]
@@ -24,7 +23,7 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/discover" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center">
               <Globe className="w-5 h-5 text-white dark:text-slate-900" />
             </div>
@@ -37,7 +36,7 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
           {user && (
             <nav className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
                 const Icon = item.icon
                 
                 return (
@@ -84,9 +83,9 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
         {/* Mobile Navigation */}
         {user && (
           <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-            <div className="grid grid-cols-3 gap-1 p-2">
+            <div className="grid grid-cols-2 gap-1 p-2">
               {navItems.map((item) => {
-                const isActive = pathname === item.href
+                const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
                 const Icon = item.icon
                 
                 return (

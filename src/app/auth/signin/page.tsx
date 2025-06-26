@@ -26,7 +26,7 @@ export default function SignInPage() {
       
       if (error) throw error
       
-      router.push('/')
+      router.push('/discover')
     } catch (error: any) {
       setError(error.message)
     } finally {
@@ -38,11 +38,11 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 px-4">
       <div className="w-full max-w-md">
         <Link
-          href="/"
+          href="/discover"
           className="inline-flex items-center text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 mb-8 font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to home
+          Back to discover
         </Link>
 
         <div className="card">
