@@ -5,7 +5,13 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, Upload } from 'lucide-react'
+import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, Upload, Settings } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 interface Profile {
   id: string
@@ -331,69 +337,78 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
             {/* Header */}
-            <div className="text-center mb-12">
-              <div className="relative inline-block mb-6">
-                {profile?.avatar_url ? (
-                  <img 
-                    src={profile.avatar_url} 
-                    alt={profile.username}
-                    className="w-24 h-24 rounded-2xl object-cover border border-slate-200 dark:border-slate-800"
-                  />
-                ) : (
-                  <div className="w-24 h-24 bg-slate-900 dark:bg-slate-100 rounded-2xl flex items-center justify-center text-white dark:text-slate-900 text-2xl font-bold">
-                    {profile?.username?.charAt(0).toUpperCase() || '?'}
+            <Card className="mb-8">
+              <CardContent className="pt-8">
+                <div className="text-center">
+                  <div className="relative inline-block mb-6">
+                    <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+                      <AvatarImage 
+                        src={profile?.avatar_url || undefined} 
+                        alt={profile?.username}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-2xl font-bold">
+                        {profile?.username?.charAt(0).toUpperCase() || '?'}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
-                )}
-              </div>
-              
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                {profile?.full_name || profile?.username || 'Your Profile'}
-              </h1>
-              
-              {profile?.full_name && (
-                <p className="text-slate-600 dark:text-slate-400 mb-2">
-                  @{profile?.username}
-                </p>
-              )}
-              
-              <p className="text-slate-500 dark:text-slate-500 text-sm mb-4">
-                {profile?.email}
-              </p>
-              
-              {profile?.bio && (
-                <p className="text-slate-700 dark:text-slate-300 max-w-md mx-auto mb-6">
-                  {profile.bio}
-                </p>
-              )}
-              
-              <div className="flex justify-center space-x-3">
-                <button
-                  onClick={() => setShowEditProfile(true)}
-                  className="btn-primary"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="btn-secondary"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Share
-                </button>
-                {profile?.username && (
-                  <a
-                    href={`/${profile.username}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-ghost"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View
-                  </a>
-                )}
-              </div>
-            </div>
+                  
+                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+                    {profile?.full_name || profile?.username || 'Your Profile'}
+                  </h1>
+                  
+                  {profile?.full_name && (
+                    <p className="text-slate-600 dark:text-slate-400 mb-2">
+                      @{profile?.username}
+                    </p>
+                  )}
+                  
+                  <p className="text-slate-500 dark:text-slate-500 text-sm mb-4">
+                    {profile?.email}
+                  </p>
+                  
+                  {profile?.bio && (
+                    <p className="text-slate-700 dark:text-slate-300 max-w-md mx-auto mb-6">
+                      {profile.bio}
+                    </p>
+                  )}
+                  
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <Button
+                      onClick={() => setShowEditProfile(true)}
+                      className="flex items-center gap-2"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Edit Profile
+                    </Button>
+                    <Button
+                      onClick={handleShare}
+                      variant="secondary"
+                      className="flex items-center gap-2"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </Button>
+                    {profile?.username && (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="flex items-center gap-2"
+                      >
+                        <a
+                          href={`/${profile.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          View Public
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Edit Profile Modal */}
             {showEditProfile && (
@@ -544,129 +559,144 @@ export default function ProfilePage() {
             )}
 
             {/* Locations Section */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                  Travel Locations
-                </h2>
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className="btn-primary"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Location
-                </button>
-              </div>
-
-              {/* Add Location Form */}
-              {showAddForm && (
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Type
-                      </label>
-                      <select
-                        value={locationType}
-                        onChange={(e) => setLocationType(e.target.value as 'lived' | 'visited')}
-                        className="input"
-                      >
-                        <option value="visited">Visited</option>
-                        <option value="lived">Lived</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        Country
-                      </label>
-                      <select
-                        value={selectedCountry}
-                        onChange={(e) => setSelectedCountry(e.target.value)}
-                        className="input"
-                      >
-                        <option value="">Select country</option>
-                        {countries.map(country => (
-                          <option key={country.id} value={country.id}>
-                            {country.flag} {country.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                        City (Optional)
-                      </label>
-                      <select
-                        value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.target.value)}
-                        disabled={!selectedCountry}
-                        className="input disabled:opacity-50"
-                      >
-                        <option value="">Select city</option>
-                        {cities.map(city => (
-                          <option key={city.id} value={city.id}>
-                            {city.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex items-end gap-2">
-                      <button
-                        onClick={handleAddLocation}
-                        disabled={!selectedCountry || saving}
-                        className="btn-primary disabled:opacity-50"
-                      >
-                        {saving ? 'Adding...' : 'Add'}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowAddForm(false)
-                          setSelectedCountry('')
-                          setSelectedCity('')
-                        }}
-                        className="btn-secondary"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
+                    Travel Locations
+                  </CardTitle>
+                  <Button
+                    onClick={() => setShowAddForm(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Location
+                  </Button>
                 </div>
-              )}
+              </CardHeader>
+              <CardContent>
 
-              {/* Locations List */}
-              {userLocations.length === 0 ? (
-                <div className="text-center py-12">
-                  <MapPin className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                  <p className="text-slate-600 dark:text-slate-400">
-                    No locations added yet. Start by adding places you've visited or lived in!
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {userLocations.map(location => (
-                    <div key={location.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl">{location.country.flag}</span>
+                {/* Add Location Form */}
+                {showAddForm && (
+                  <Card className="mb-6">
+                    <CardContent className="pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div>
-                          <div className="font-medium text-slate-900 dark:text-white">
-                            {location.city ? location.city.name + ', ' : ''}{location.country.name}
-                          </div>
-                          <div className="text-sm text-slate-600 dark:text-slate-400 capitalize">
-                            {location.type}
-                          </div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Type
+                          </label>
+                          <select
+                            value={locationType}
+                            onChange={(e) => setLocationType(e.target.value as 'lived' | 'visited')}
+                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900"
+                          >
+                            <option value="visited">Visited</option>
+                            <option value="lived">Lived</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            Country
+                          </label>
+                          <select
+                            value={selectedCountry}
+                            onChange={(e) => setSelectedCountry(e.target.value)}
+                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900"
+                          >
+                            <option value="">Select country</option>
+                            {countries.map(country => (
+                              <option key={country.id} value={country.id}>
+                                {country.flag} {country.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                            City (Optional)
+                          </label>
+                          <select
+                            value={selectedCity}
+                            onChange={(e) => setSelectedCity(e.target.value)}
+                            disabled={!selectedCountry}
+                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 disabled:opacity-50"
+                          >
+                            <option value="">Select city</option>
+                            {cities.map(city => (
+                              <option key={city.id} value={city.id}>
+                                {city.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <Button
+                            onClick={handleAddLocation}
+                            disabled={!selectedCountry || saving}
+                            className="flex-1"
+                          >
+                            {saving ? 'Adding...' : 'Add'}
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setShowAddForm(false)
+                              setSelectedCountry('')
+                              setSelectedCity('')
+                            }}
+                            variant="secondary"
+                          >
+                            Cancel
+                          </Button>
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleRemoveLocation(location.id)}
-                        className="p-2 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Locations List */}
+                {userLocations.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MapPin className="w-8 h-8 text-slate-400" />
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      No locations added yet. Start by adding places you've visited or lived in!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-3">
+                    {userLocations.map(location => (
+                      <Card key={location.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">{location.country.flag}</span>
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white">
+                                  {location.city ? location.city.name + ', ' : ''}{location.country.name}
+                                </div>
+                                <Badge variant="secondary" className="text-xs">
+                                  {location.type}
+                                </Badge>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleRemoveLocation(location.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-slate-400 hover:text-red-500"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
