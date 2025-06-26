@@ -5,6 +5,11 @@ import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { MapPin, Globe, Share2, Calendar, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
 
 interface Profile {
   id: string
@@ -130,22 +135,24 @@ export default function PublicProfilePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
+      <div className="sticky top-0 z-10 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/discover" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center">
-                <Globe className="w-5 h-5 text-white dark:text-slate-900" />
+            <Link href="/discover" className="flex items-center space-x-3 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                <Globe className="w-6 h-6 text-white dark:text-slate-900" />
               </div>
-              <span className="text-xl font-bold text-slate-900 dark:text-white">TravelBio</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+                TravelBio
+              </span>
             </Link>
-            <button
+            <Button
               onClick={handleShare}
-              className="btn-primary"
+              className="flex items-center gap-2"
             >
-              <Share2 className="w-4 h-4 mr-2" />
+              <Share2 className="w-4 h-4" />
               Share
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -153,129 +160,161 @@ export default function PublicProfilePage({ params }: PageProps) {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="animate-fade-in">
           {/* Profile Header */}
-          <div className="text-center mb-12">
-            <div className="relative inline-block mb-6">
-              {profile.avatar_url ? (
-                <img 
-                  src={profile.avatar_url} 
-                  alt={profile.username}
-                  className="w-32 h-32 rounded-3xl object-cover border border-slate-200 dark:border-slate-800"
-                />
-              ) : (
-                <div className="w-32 h-32 bg-slate-900 dark:bg-slate-100 rounded-3xl flex items-center justify-center text-white dark:text-slate-900 text-4xl font-bold">
-                  {profile.username.charAt(0).toUpperCase()}
+          <Card className="mb-8">
+            <CardContent className="pt-8">
+              <div className="text-center">
+                <div className="relative inline-block mb-6">
+                  <Avatar className="w-32 h-32 border-4 border-white shadow-xl">
+                    <AvatarImage 
+                      src={profile.avatar_url || undefined} 
+                      alt={profile.username}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-4xl font-bold">
+                      {profile.username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
-              )}
-            </div>
-            
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3">
-              {profile.full_name || profile.username}
-            </h1>
-            
-            <p className="text-xl text-slate-600 dark:text-slate-400 mb-4">
-              @{profile.username}
-            </p>
-            
-            {profile.bio && (
-              <p className="text-lg text-slate-700 dark:text-slate-300 max-w-2xl mx-auto mb-6 leading-relaxed">
-                {profile.bio}
-              </p>
-            )}
-            
-            <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400">
-              <Calendar className="w-4 h-4" />
-              <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
-            </div>
-          </div>
+                
+                <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3">
+                  {profile.full_name || profile.username}
+                </h1>
+                
+                <p className="text-xl text-slate-600 dark:text-slate-400 mb-4">
+                  @{profile.username}
+                </p>
+                
+                {profile.bio && (
+                  <>
+                    <p className="text-lg text-slate-700 dark:text-slate-300 max-w-2xl mx-auto mb-6 leading-relaxed">
+                      {profile.bio}
+                    </p>
+                    <Separator className="my-6" />
+                  </>
+                )}
+                
+                <div className="flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400">
+                  <Calendar className="w-4 h-4" />
+                  <span>Joined {new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
-            <div className="card text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCountries}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Countries</div>
-            </div>
-            <div className="card text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCities}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Cities</div>
-            </div>
-            <div className="card text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{livedLocations.length}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Lived</div>
-            </div>
-            <div className="card text-center">
-              <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{visitedLocations.length}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">Visited</div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <Card className="text-center hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCountries}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Countries</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{totalCities}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Cities</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{livedLocations.length}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Lived</div>
+              </CardContent>
+            </Card>
+            <Card className="text-center hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{visitedLocations.length}</div>
+                <div className="text-sm text-slate-600 dark:text-slate-400">Visited</div>
+              </CardContent>
+            </Card>
           </div>
 
           {userLocations.length === 0 ? (
-            <div className="card text-center py-16">
-              <MapPin className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                No travel history yet
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                {profile.username} hasn't added any travel experiences yet.
-              </p>
-            </div>
+            <Card className="text-center py-16">
+              <CardContent>
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                  No travel history yet
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400">
+                  {profile.username} hasn't added any travel experiences yet.
+                </p>
+              </CardContent>
+            </Card>
           ) : (
             <div className="space-y-8">
               {/* Lived Locations */}
               {livedLocations.length > 0 && (
-                <div className="card">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center">
-                    <div className="w-6 h-6 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white dark:text-slate-900 text-sm">🏠</span>
-                    </div>
-                    Places I've Lived
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {livedLocations.map(location => (
-                      <div key={location.id} className="flex items-center space-x-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                        <span className="text-3xl">{location.country.flag}</span>
-                        <div>
-                          <div className="font-semibold text-slate-900 dark:text-white">
-                            {location.city ? location.city.name : location.country.name}
-                          </div>
-                          {location.city && (
-                            <div className="text-sm text-slate-600 dark:text-slate-400">
-                              {location.country.name}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <span className="text-2xl">🏠</span>
+                      Places I've Lived
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {livedLocations.map(location => (
+                        <Card key={location.id} className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center space-x-4">
+                            <span className="text-3xl">{location.country.flag}</span>
+                            <div>
+                              <div className="font-semibold text-slate-900 dark:text-white">
+                                {location.city ? location.city.name : location.country.name}
+                              </div>
+                              {location.city && (
+                                <div className="text-sm text-slate-600 dark:text-slate-400">
+                                  {location.country.name}
+                                </div>
+                              )}
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                Lived
+                              </Badge>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Visited Locations */}
               {visitedLocations.length > 0 && (
-                <div className="card">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center">
-                    <div className="w-6 h-6 bg-slate-900 dark:bg-slate-100 rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white dark:text-slate-900 text-sm">✈️</span>
-                    </div>
-                    Places I've Visited
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {visitedLocations.map(location => (
-                      <div key={location.id} className="flex items-center space-x-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                        <span className="text-2xl">{location.country.flag}</span>
-                        <div>
-                          <div className="font-medium text-slate-900 dark:text-white">
-                            {location.city ? location.city.name : location.country.name}
-                          </div>
-                          {location.city && (
-                            <div className="text-xs text-slate-600 dark:text-slate-400">
-                              {location.country.name}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3">
+                      <span className="text-2xl">✈️</span>
+                      Places I've Visited
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {visitedLocations.map(location => (
+                        <Card key={location.id} className="p-3 hover:shadow-md transition-shadow">
+                          <div className="flex items-center space-x-3">
+                            <span className="text-2xl">{location.country.flag}</span>
+                            <div>
+                              <div className="font-medium text-slate-900 dark:text-white">
+                                {location.city ? location.city.name : location.country.name}
+                              </div>
+                              {location.city && (
+                                <div className="text-xs text-slate-600 dark:text-slate-400">
+                                  {location.country.name}
+                                </div>
+                              )}
+                              <Badge variant="secondary" className="text-xs mt-1">
+                                Visited
+                              </Badge>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
             </div>
           )}
