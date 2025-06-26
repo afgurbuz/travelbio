@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Save, Plus, X } from 'lucide-react'
+import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink } from 'lucide-react'
 
 interface Profile {
   id: string
@@ -117,6 +117,27 @@ export default function ProfilePage() {
     await supabase.auth.signOut()
   }
 
+  const handleShare = async () => {
+    if (!profile?.username) return
+    
+    const profileUrl = `${window.location.origin}/${profile.username}`
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${profile.username}'s Travel Profile`,
+          text: `Check out my travel experiences on TravelBio`,
+          url: profileUrl,
+        })
+      } catch (error) {
+        console.log('Error sharing:', error)
+      }
+    } else {
+      navigator.clipboard.writeText(profileUrl)
+      alert('Profile link copied to clipboard!')
+    }
+  }
+
   const handleAddLocation = async () => {
     if (!selectedCountry || !user) return
     
@@ -191,9 +212,29 @@ export default function ProfilePage() {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {profile?.username || 'Your Profile'}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               {profile?.email}
             </p>
+            <div className="flex justify-center space-x-3">
+              <button
+                onClick={handleShare}
+                className="inline-flex items-center px-4 py-2 bg-sky-500 text-white rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share Profile
+              </button>
+              {profile?.username && (
+                <a
+                  href={`/${profile.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  View Public
+                </a>
+              )}
+            </div>
           </div>
 
           {/* Locations Section */}
