@@ -197,9 +197,9 @@ export default function ProfilePage() {
       return
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size must be less than 5MB')
+    // Validate file size (max 1MB)
+    if (file.size > 1 * 1024 * 1024) {
+      alert('Image size must be less than 1MB')
       return
     }
 
@@ -452,7 +452,7 @@ export default function ProfilePage() {
                           {uploading ? 'Uploading...' : 'Upload Photo'}
                         </label>
                         <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                          JPG, PNG or GIF (max 5MB)
+                          JPG, PNG or GIF (max 1MB)
                         </p>
                       </div>
                     </div>
