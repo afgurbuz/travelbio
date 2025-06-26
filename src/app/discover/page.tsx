@@ -70,7 +70,7 @@ export default function DiscoverPage() {
       if (profilesData && profilesData.length > 0) {
         // Get location counts for each profile
         const profilesWithCounts = await Promise.all(
-          profilesData.map(async (profile) => {
+          profilesData.map(async (profile: any) => {
             const { data: locationsData } = await supabase
               .from('user_locations')
               .select('country_id')
