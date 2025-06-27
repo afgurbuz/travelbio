@@ -266,8 +266,8 @@ export default function PublicProfilePage({ params }: PageProps) {
                   </p>
                 </div>
               ) : activeTab === 'countries' ? (
-                /* Countries Tab */
-                <div className="space-y-6">
+                /* Countries Tab - Compact Grid Layout */
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Group locations by country */}
                   {Object.entries(
                     userLocations.reduce((acc, location) => {
@@ -281,111 +281,80 @@ export default function PublicProfilePage({ params }: PageProps) {
                       acc[countryKey].locations.push(location)
                       return acc
                     }, {} as Record<string, { country: Country; locations: UserLocation[] }>)
-                  ).map(([countryKey, { country, locations }]) => (
-                    <Card key={countryKey} className="overflow-hidden">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <span className="text-3xl">{country.flag}</span>
-                            <div>
+                  ).map(([countryKey, { country, locations }]) => {
+                    const avgRating = locations.filter(l => l.overall_rating).length > 0 
+                      ? locations.reduce((sum, l) => sum + (l.overall_rating || 0), 0) / locations.filter(l => l.overall_rating).length 
+                      : 0
+                    
+                    return (
+                      <Card key={countryKey} className="h-fit">
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="text-2xl">{country.flag}</span>
+                            <div className="flex-1">
                               <Link 
                                 href={`/country/${country.code.toLowerCase()}`}
-                                className="text-xl font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                className="font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300"
                               >
                                 {country.name}
                               </Link>
-                              <p className="text-sm text-slate-600 dark:text-slate-400">
-                                {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="space-y-3">
-                          {locations.map(location => (
-                            <div key={location.id} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Badge variant={location.type === 'lived' ? 'default' : 'secondary'}>
-                                      {location.type === 'lived' ? '🏠 Lived' : '✈️ Visited'}
-                                    </Badge>
-                                    {location.city && (
-                                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                        {location.city.name}
-                                      </span>
-                                    )}
-                                    {location.visit_date && (
-                                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                                        {new Date(location.visit_date).toLocaleDateString()}
-                                      </span>
-                                    )}
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                  {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
+                                </span>
+                                {avgRating > 0 && (
+                                  <div className="flex items-center gap-1">
+                                    <StarRating value={avgRating} readonly size="sm" />
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      {avgRating.toFixed(1)}
+                                    </span>
                                   </div>
-                                  
-                                  {/* Show ratings if available */}
-                                  {location.overall_rating && (
-                                    <div className="mb-2">
-                                      <StarRating value={location.overall_rating} readonly showValue size="sm" />
-                                    </div>
-                                  )}
-                                  
-                                  {/* Show comment if available */}
-                                  {location.comment && (
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 italic mb-3">
-                                      "{location.comment}"
-                                    </p>
-                                  )}
-                                  
-                                  {/* Show detailed ratings if available */}
-                                  {(location.transportation_rating || location.accommodation_rating || location.food_rating || location.safety_rating || location.activities_rating || location.value_rating) && (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-                                      {location.transportation_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Transport:</span>
-                                          <StarRating value={location.transportation_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                      {location.accommodation_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Stay:</span>
-                                          <StarRating value={location.accommodation_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                      {location.food_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Food:</span>
-                                          <StarRating value={location.food_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                      {location.safety_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Safety:</span>
-                                          <StarRating value={location.safety_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                      {location.activities_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Activities:</span>
-                                          <StarRating value={location.activities_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                      {location.value_rating && (
-                                        <div className="flex items-center gap-1">
-                                          <span className="text-slate-500 dark:text-slate-400">Value:</span>
-                                          <StarRating value={location.value_rating} readonly size="sm" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
+                                )}
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          </div>
+                          
+                          {/* Compact trip list */}
+                          <div className="space-y-2">
+                            {locations.map(location => (
+                              <div key={location.id} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2">
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
+                                  <Badge 
+                                    variant={location.type === 'lived' ? 'default' : 'secondary'}
+                                    className="text-xs shrink-0"
+                                  >
+                                    {location.type === 'lived' ? '🏠' : '✈️'}
+                                  </Badge>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-1">
+                                      {location.city && (
+                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                                          {location.city.name}
+                                        </span>
+                                      )}
+                                      {location.visit_date && (
+                                        <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
+                                          {new Date(location.visit_date).getFullYear()}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {location.overall_rating && (
+                                      <StarRating value={location.overall_rating} readonly size="sm" />
+                                    )}
+                                    {location.comment && (
+                                      <p className="text-xs text-slate-600 dark:text-slate-400 italic mt-1 line-clamp-2">
+                                        "{location.comment}"
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               ) : (
                 /* Timeline Tab */
