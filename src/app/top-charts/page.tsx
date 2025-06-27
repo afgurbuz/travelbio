@@ -63,36 +63,79 @@ export default function TopChartsPage() {
   useEffect(() => {
     const loadRankings = async () => {
       try {
-        // Load countries with ratings data
-        const { data: ratingsData, error } = await supabase
-          .from('country_ratings')
-          .select(`
-            *,
-            country:countries(*)
-          `)
-          .gte('visitor_count', 1) // At least 1 visitor for meaningful ratings
-          .order('avg_overall', { ascending: false })
+        // Load countries with ratings data directly from user_locations
+        const { data: countriesData, error: countriesError } = await supabase
+          .from('countries')
+          .select('*')
 
-        if (error) throw error
+        if (countriesError) throw countriesError
 
-        if (ratingsData) {
-          const rankings: CountryRanking[] = ratingsData
-            .filter((r: any) => r.country && r.avg_overall > 0)
-            .map((r: any) => ({
-              id: r.country.id,
-              code: r.country.code,
-              name: r.country.name,
-              flag: r.country.flag,
-              visitor_count: r.visitor_count,
-              avg_overall: r.avg_overall,
-              avg_transportation: r.avg_transportation || 0,
-              avg_accommodation: r.avg_accommodation || 0,
-              avg_food: r.avg_food || 0,
-              avg_safety: r.avg_safety || 0,
-              avg_activities: r.avg_activities || 0,
-              avg_value: r.avg_value || 0,
-              trip_count: r.visitor_count // Using visitor_count as trip_count for now
-            }))
+        // Calculate ratings for each country
+        const ratingsData = await Promise.all(
+          (countriesData || []).map(async (country: any) => {
+            const { data: locationsData } = await supabase
+              .from('user_locations')
+              .select('*')
+              .eq('country_id', country.id)
+              .not('overall_rating', 'is', null)
+
+            if (!locationsData || locationsData.length === 0) {
+              return null // Skip countries with no ratings
+            }
+
+            const visitor_count = new Set(locationsData.map((l: any) => l.user_id)).size
+            const avg_overall = locationsData.reduce((sum: number, l: any) => sum + (l.overall_rating || 0), 0) / locationsData.length
+            const avg_transportation = locationsData.filter((l: any) => l.transportation_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.transportation_rating || 0), 0) / locationsData.filter((l: any) => l.transportation_rating).length 
+              : 0
+            const avg_accommodation = locationsData.filter((l: any) => l.accommodation_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.accommodation_rating || 0), 0) / locationsData.filter((l: any) => l.accommodation_rating).length 
+              : 0
+            const avg_food = locationsData.filter((l: any) => l.food_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.food_rating || 0), 0) / locationsData.filter((l: any) => l.food_rating).length 
+              : 0
+            const avg_safety = locationsData.filter((l: any) => l.safety_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.safety_rating || 0), 0) / locationsData.filter((l: any) => l.safety_rating).length 
+              : 0
+            const avg_activities = locationsData.filter((l: any) => l.activities_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.activities_rating || 0), 0) / locationsData.filter((l: any) => l.activities_rating).length 
+              : 0
+            const avg_value = locationsData.filter((l: any) => l.value_rating).length > 0 
+              ? locationsData.reduce((sum: number, l: any) => sum + (l.value_rating || 0), 0) / locationsData.filter((l: any) => l.value_rating).length 
+              : 0
+
+            return {
+              ...country,
+              visitor_count,
+              avg_overall: Math.round(avg_overall * 10) / 10,
+              avg_transportation: Math.round(avg_transportation * 10) / 10,
+              avg_accommodation: Math.round(avg_accommodation * 10) / 10,
+              avg_food: Math.round(avg_food * 10) / 10,
+              avg_safety: Math.round(avg_safety * 10) / 10,
+              avg_activities: Math.round(avg_activities * 10) / 10,
+              avg_value: Math.round(avg_value * 10) / 10,
+            }
+          })
+        )
+
+        const validRatingsData = ratingsData.filter(r => r !== null && r.avg_overall > 0)
+
+        if (validRatingsData && validRatingsData.length > 0) {
+          const rankings: CountryRanking[] = validRatingsData.map((r: any) => ({
+            id: r.id,
+            code: r.code,
+            name: r.name,
+            flag: r.flag,
+            visitor_count: r.visitor_count,
+            avg_overall: r.avg_overall,
+            avg_transportation: r.avg_transportation || 0,
+            avg_accommodation: r.avg_accommodation || 0,
+            avg_food: r.avg_food || 0,
+            avg_safety: r.avg_safety || 0,
+            avg_activities: r.avg_activities || 0,
+            avg_value: r.avg_value || 0,
+            trip_count: r.visitor_count
+          }))
 
           // Top 10 overall
           setTopCountries(rankings.slice(0, 10))
