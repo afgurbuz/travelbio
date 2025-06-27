@@ -12,6 +12,9 @@ import { Input } from '@/components/ui/input'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import StarRating from '@/components/StarRating'
 
 interface Profile {
   id: string
@@ -57,6 +60,17 @@ export default function ProfilePage() {
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
   const [locationType, setLocationType] = useState<'lived' | 'visited'>('visited')
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [ratings, setRatings] = useState({
+    transportation: 0,
+    accommodation: 0,
+    food: 0,
+    safety: 0,
+    activities: 0,
+    value: 0,
+    overall: 0,
+    comment: ''
+  })
   const [showEditProfile, setShowEditProfile] = useState(false)
   const [editFullName, setEditFullName] = useState('')
   const [editBio, setEditBio] = useState('')
@@ -270,6 +284,11 @@ export default function ProfilePage() {
     }
   }
 
+  const handleProceedToRating = () => {
+    if (!selectedCountry) return
+    setShowRatingModal(true)
+  }
+
   const handleAddLocation = async () => {
     if (!selectedCountry || !user) return
     
@@ -281,7 +300,15 @@ export default function ProfilePage() {
           user_id: user.id,
           country_id: parseInt(selectedCountry),
           city_id: selectedCity ? parseInt(selectedCity) : null,
-          type: locationType
+          type: locationType,
+          transportation_rating: ratings.transportation || null,
+          accommodation_rating: ratings.accommodation || null,
+          food_rating: ratings.food || null,
+          safety_rating: ratings.safety || null,
+          activities_rating: ratings.activities || null,
+          value_rating: ratings.value || null,
+          overall_rating: ratings.overall || null,
+          comment: ratings.comment || null
         })
       
       if (!error) {
@@ -296,9 +323,21 @@ export default function ProfilePage() {
         
         if (locationsData) setUserLocations(locationsData as UserLocation[])
         
+        // Reset all forms
         setShowAddForm(false)
+        setShowRatingModal(false)
         setSelectedCountry('')
         setSelectedCity('')
+        setRatings({
+          transportation: 0,
+          accommodation: 0,
+          food: 0,
+          safety: 0,
+          activities: 0,
+          value: 0,
+          overall: 0,
+          comment: ''
+        })
       }
     } catch (error) {
       console.error('Error adding location:', error)
@@ -632,11 +671,11 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex items-end gap-2">
                           <Button
-                            onClick={handleAddLocation}
-                            disabled={!selectedCountry || saving}
+                            onClick={handleProceedToRating}
+                            disabled={!selectedCountry}
                             className="flex-1"
                           >
-                            {saving ? 'Adding...' : 'Add'}
+                            Continue to Rating
                           </Button>
                           <Button
                             onClick={() => {
@@ -697,6 +736,135 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Rating Modal */}
+            {showRatingModal && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Rate Your Experience</CardTitle>
+                      <Button
+                        onClick={() => setShowRatingModal(false)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      {countries.find(c => c.id === parseInt(selectedCountry))?.flag} {countries.find(c => c.id === parseInt(selectedCountry))?.name}
+                      {selectedCity && (
+                        <span> - {cities.find(c => c.id === parseInt(selectedCity))?.name}</span>
+                      )}
+                    </p>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Transportation</Label>
+                        <StarRating
+                          value={ratings.transportation}
+                          onChange={(value) => setRatings(prev => ({...prev, transportation: value}))}
+                          size="lg"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Accommodation</Label>
+                        <StarRating
+                          value={ratings.accommodation}
+                          onChange={(value) => setRatings(prev => ({...prev, accommodation: value}))}
+                          size="lg"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Food & Dining</Label>
+                        <StarRating
+                          value={ratings.food}
+                          onChange={(value) => setRatings(prev => ({...prev, food: value}))}
+                          size="lg"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Safety</Label>
+                        <StarRating
+                          value={ratings.safety}
+                          onChange={(value) => setRatings(prev => ({...prev, safety: value}))}
+                          size="lg"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Activities & Attractions</Label>
+                        <StarRating
+                          value={ratings.activities}
+                          onChange={(value) => setRatings(prev => ({...prev, activities: value}))}
+                          size="lg"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-base font-medium mb-3 block">Value for Money</Label>
+                        <StarRating
+                          value={ratings.value}
+                          onChange={(value) => setRatings(prev => ({...prev, value: value}))}
+                          size="lg"
+                        />
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <Label className="text-base font-medium mb-3 block">Overall Rating</Label>
+                      <StarRating
+                        value={ratings.overall}
+                        onChange={(value) => setRatings(prev => ({...prev, overall: value}))}
+                        size="lg"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="comment" className="text-base font-medium mb-3 block">
+                        Your Experience (Optional)
+                      </Label>
+                      <Textarea
+                        id="comment"
+                        value={ratings.comment}
+                        onChange={(e) => setRatings(prev => ({...prev, comment: e.target.value}))}
+                        placeholder="Share your thoughts about this destination..."
+                        rows={4}
+                        maxLength={500}
+                      />
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        {ratings.comment.length}/500 characters
+                      </p>
+                    </div>
+                    
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        onClick={() => setShowRatingModal(false)}
+                        variant="secondary"
+                        className="flex-1"
+                      >
+                        Skip Rating
+                      </Button>
+                      <Button
+                        onClick={handleAddLocation}
+                        disabled={saving}
+                        className="flex-1"
+                      >
+                        {saving ? 'Adding Location...' : 'Add Location'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </main>
