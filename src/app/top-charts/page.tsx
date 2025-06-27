@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { Trophy, Star, Users, MapPin, TrendingUp, Medal, Award } from 'lucide-react'
+import { Trophy, Star, Users, MapPin, TrendingUp, Medal, Award, Car, Home, Utensils, Shield, Gamepad2, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -101,61 +101,61 @@ export default function TopChartsPage() {
           const visitedSorted = [...rankings].sort((a, b) => b.visitor_count - a.visitor_count)
           setMostVisited(visitedSorted.slice(0, 10))
 
-          // Category rankings
+          // Category rankings with more countries and better icons
           const categories: CategoryRanking[] = [
             {
               category: 'transportation',
-              icon: <MapPin className="w-5 h-5" />,
+              icon: <Car className="w-5 h-5" />,
               title: 'Best Transportation',
               countries: [...rankings]
                 .filter(c => c.avg_transportation > 0)
                 .sort((a, b) => b.avg_transportation - a.avg_transportation)
-                .slice(0, 5)
+                .slice(0, 10)
             },
             {
               category: 'accommodation',
-              icon: <Award className="w-5 h-5" />,
+              icon: <Home className="w-5 h-5" />,
               title: 'Best Accommodation',
               countries: [...rankings]
                 .filter(c => c.avg_accommodation > 0)
                 .sort((a, b) => b.avg_accommodation - a.avg_accommodation)
-                .slice(0, 5)
+                .slice(0, 10)
             },
             {
               category: 'food',
-              icon: <Trophy className="w-5 h-5" />,
+              icon: <Utensils className="w-5 h-5" />,
               title: 'Best Food & Dining',
               countries: [...rankings]
                 .filter(c => c.avg_food > 0)
                 .sort((a, b) => b.avg_food - a.avg_food)
-                .slice(0, 5)
+                .slice(0, 10)
             },
             {
               category: 'safety',
-              icon: <Medal className="w-5 h-5" />,
+              icon: <Shield className="w-5 h-5" />,
               title: 'Safest Countries',
               countries: [...rankings]
                 .filter(c => c.avg_safety > 0)
                 .sort((a, b) => b.avg_safety - a.avg_safety)
-                .slice(0, 5)
+                .slice(0, 10)
             },
             {
               category: 'activities',
-              icon: <Star className="w-5 h-5" />,
-              title: 'Best Activities',
+              icon: <Gamepad2 className="w-5 h-5" />,
+              title: 'Best Activities & Attractions',
               countries: [...rankings]
                 .filter(c => c.avg_activities > 0)
                 .sort((a, b) => b.avg_activities - a.avg_activities)
-                .slice(0, 5)
+                .slice(0, 10)
             },
             {
               category: 'value',
-              icon: <TrendingUp className="w-5 h-5" />,
+              icon: <DollarSign className="w-5 h-5" />,
               title: 'Best Value for Money',
               countries: [...rankings]
                 .filter(c => c.avg_value > 0)
                 .sort((a, b) => b.avg_value - a.avg_value)
-                .slice(0, 5)
+                .slice(0, 10)
             }
           ]
 
@@ -219,8 +219,8 @@ export default function TopChartsPage() {
               </h1>
               
               <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
-                Discover the world's best destinations ranked by real travelers. 
-                Find out which countries excel in different categories.
+                Discover the world's best destinations ranked by real travelers across 6 key categories. 
+                From transportation and accommodation to food, safety, activities, and value for money.
               </p>
             </div>
 
@@ -328,52 +328,88 @@ export default function TopChartsPage() {
               </CardContent>
             </Card>
 
-            {/* Category Rankings */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Category Rankings - Each category gets its own section */}
+            <div className="space-y-12">
               {categoryRankings.map((category) => (
-                <Card key={category.category}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3">
+                <Card key={category.category} className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-b">
+                    <CardTitle className="flex items-center gap-3 text-2xl">
                       {category.icon}
                       {category.title}
                     </CardTitle>
+                    <p className="text-slate-600 dark:text-slate-400">
+                      Top {category.countries.length} destinations ranked by traveler ratings
+                    </p>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     {category.countries.length === 0 ? (
-                      <div className="text-center py-8">
-                        <p className="text-slate-500 dark:text-slate-400">No ratings yet</p>
+                      <div className="text-center py-16">
+                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                          {category.icon}
+                        </div>
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                          No ratings yet
+                        </h3>
+                        <p className="text-slate-500 dark:text-slate-400">
+                          Be the first to rate countries in this category!
+                        </p>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        {category.countries.map((country, index) => (
-                          <Link 
-                            key={country.id}
-                            href={`/country/${country.code.toLowerCase()}`}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors group"
-                          >
-                            <div className="flex items-center gap-2">
-                              {getRankMedal(index + 1)}
-                              <span className="text-2xl">{country.flag}</span>
-                            </div>
-                            
-                            <div className="flex-1">
-                              <h4 className="font-medium text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                                {country.name}
-                              </h4>
-                              <StarRating 
-                                value={category.category === 'transportation' ? country.avg_transportation :
-                                       category.category === 'accommodation' ? country.avg_accommodation :
-                                       category.category === 'food' ? country.avg_food :
-                                       category.category === 'safety' ? country.avg_safety :
-                                       category.category === 'activities' ? country.avg_activities :
-                                       country.avg_value} 
-                                readonly 
-                                size="sm" 
-                                showValue
-                              />
-                            </div>
-                          </Link>
-                        ))}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {category.countries.map((country, index) => {
+                          const categoryValue = category.category === 'transportation' ? country.avg_transportation :
+                                               category.category === 'accommodation' ? country.avg_accommodation :
+                                               category.category === 'food' ? country.avg_food :
+                                               category.category === 'safety' ? country.avg_safety :
+                                               category.category === 'activities' ? country.avg_activities :
+                                               country.avg_value;
+                          
+                          return (
+                            <Link 
+                              key={country.id}
+                              href={`/country/${country.code.toLowerCase()}`}
+                              className="group"
+                            >
+                              <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
+                                <CardContent className="p-4">
+                                  <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-3">
+                                      {getRankMedal(index + 1)}
+                                      <span className="text-3xl">{country.flag}</span>
+                                    </div>
+                                    
+                                    <div className="flex-1">
+                                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors mb-2">
+                                        {country.name}
+                                      </h4>
+                                      
+                                      <div className="flex items-center gap-3 mb-2">
+                                        <StarRating 
+                                          value={categoryValue} 
+                                          readonly 
+                                          size="sm" 
+                                          showValue
+                                        />
+                                        <Badge variant="secondary" className="flex items-center gap-1">
+                                          <Users className="w-3 h-3" />
+                                          {country.visitor_count}
+                                        </Badge>
+                                      </div>
+                                      
+                                      {/* Progress bar for visual rating */}
+                                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                                        <div 
+                                          className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all duration-500"
+                                          style={{ width: `${(categoryValue / 5) * 100}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </Link>
+                          )
+                        })}
                       </div>
                     )}
                   </CardContent>
