@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
 import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, Upload, Settings } from 'lucide-react'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -713,7 +714,13 @@ export default function ProfilePage() {
                               <span className="text-2xl">{location.country.flag}</span>
                               <div>
                                 <div className="font-medium text-slate-900 dark:text-white">
-                                  {location.city ? location.city.name + ', ' : ''}{location.country.name}
+                                  {location.city ? location.city.name + ', ' : ''}
+                                  <Link 
+                                    href={`/country/${location.country.code.toLowerCase()}`}
+                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                  >
+                                    {location.country.name}
+                                  </Link>
                                 </div>
                                 <Badge variant="secondary" className="text-xs">
                                   {location.type}

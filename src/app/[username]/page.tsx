@@ -233,13 +233,24 @@ export default function PublicProfilePage({ params }: PageProps) {
                             <span className="text-3xl">{location.country.flag}</span>
                             <div>
                               <div className="font-semibold text-slate-900 dark:text-white">
-                                {location.city ? location.city.name : location.country.name}
+                                {location.city ? (
+                                  <>
+                                    {location.city.name}, <Link 
+                                      href={`/country/${location.country.code.toLowerCase()}`}
+                                      className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                    >
+                                      {location.country.name}
+                                    </Link>
+                                  </>
+                                ) : (
+                                  <Link 
+                                    href={`/country/${location.country.code.toLowerCase()}`}
+                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                  >
+                                    {location.country.name}
+                                  </Link>
+                                )}
                               </div>
-                              {location.city && (
-                                <div className="text-sm text-slate-600 dark:text-slate-400">
-                                  {location.country.name}
-                                </div>
-                              )}
                               <Badge variant="secondary" className="text-xs mt-1">
                                 Lived
                               </Badge>
@@ -269,13 +280,24 @@ export default function PublicProfilePage({ params }: PageProps) {
                             <span className="text-2xl">{location.country.flag}</span>
                             <div>
                               <div className="font-medium text-slate-900 dark:text-white">
-                                {location.city ? location.city.name : location.country.name}
+                                {location.city ? (
+                                  <>
+                                    {location.city.name}, <Link 
+                                      href={`/country/${location.country.code.toLowerCase()}`}
+                                      className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                    >
+                                      {location.country.name}
+                                    </Link>
+                                  </>
+                                ) : (
+                                  <Link 
+                                    href={`/country/${location.country.code.toLowerCase()}`}
+                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                  >
+                                    {location.country.name}
+                                  </Link>
+                                )}
                               </div>
-                              {location.city && (
-                                <div className="text-xs text-slate-600 dark:text-slate-400">
-                                  {location.country.name}
-                                </div>
-                              )}
                               <Badge variant="secondary" className="text-xs mt-1">
                                 Visited
                               </Badge>
