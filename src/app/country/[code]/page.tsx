@@ -98,29 +98,23 @@ export default function CountryPage({ params }: PageProps) {
         }
 
         // Load user reviews with profiles
-        const { data: reviewsData } = await supabase
+        const { data: reviewsData, error: reviewsError } = await supabase
           .from('user_locations')
           .select(`
             id,
             user_id,
             type,
-            transportation_rating,
-            accommodation_rating,
-            food_rating,
-            safety_rating,
-            activities_rating,
-            value_rating,
             overall_rating,
             comment,
-            visit_date,
             created_at,
-            profile:profiles(username, full_name, avatar_url),
-            city:cities(name)
+            profile:profiles(username, full_name, avatar_url)
           `)
           .eq('country_id', countryData.id)
-          .or('overall_rating.not.is.null,comment.not.is.null')
           .order('created_at', { ascending: false })
-          .limit(20)
+
+        console.log('Country ID:', countryData.id)
+        console.log('Reviews data:', reviewsData)
+        console.log('Reviews error:', reviewsError)
 
         if (reviewsData) {
           setReviews(reviewsData as UserReview[])
@@ -286,6 +280,9 @@ export default function CountryPage({ params }: PageProps) {
             </Card>
           )}
 
+          {/* Debug info */}
+          {console.log('Reviews length:', reviews.length)}
+          
           {/* User Reviews */}
           {reviews.length > 0 && (
             <Card>
