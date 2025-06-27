@@ -77,8 +77,8 @@ export default function TopChartsPage() {
 
         if (ratingsData) {
           const rankings: CountryRanking[] = ratingsData
-            .filter(r => r.country && r.avg_overall > 0)
-            .map(r => ({
+            .filter((r: any) => r.country && r.avg_overall > 0)
+            .map((r: any) => ({
               id: r.country.id,
               code: r.country.code,
               name: r.country.name,
