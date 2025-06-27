@@ -54,6 +54,8 @@ interface UserLocation {
   value_rating?: number
   overall_rating?: number
   comment?: string
+  visit_date?: string
+  created_at?: string
 }
 
 export default function ProfilePage() {
@@ -87,6 +89,7 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [activeTab, setActiveTab] = useState<'countries' | 'timeline'>('countries')
+  const [visitDate, setVisitDate] = useState('')
 
   useEffect(() => {
     const loadData = async () => {
@@ -312,6 +315,7 @@ export default function ProfilePage() {
           country_id: parseInt(selectedCountry),
           city_id: selectedCity ? parseInt(selectedCity) : null,
           type: locationType,
+          visit_date: visitDate || null,
           transportation_rating: ratings.transportation || null,
           accommodation_rating: ratings.accommodation || null,
           food_rating: ratings.food || null,
@@ -340,6 +344,7 @@ export default function ProfilePage() {
         setModalStep('location')
         setSelectedCountry('')
         setSelectedCity('')
+        setVisitDate('')
         setRatings({
           transportation: 0,
           accommodation: 0,
@@ -713,6 +718,11 @@ export default function ProfilePage() {
                                           {location.city.name}
                                         </span>
                                       )}
+                                      {location.visit_date && (
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                                          {new Date(location.visit_date).toLocaleDateString()}
+                                        </span>
+                                      )}
                                     </div>
                                     
                                     {/* Show ratings if available */}
@@ -811,6 +821,11 @@ export default function ProfilePage() {
                                   <Badge variant={location.type === 'lived' ? 'default' : 'secondary'} className="text-xs">
                                     {location.type === 'lived' ? '🏠 Lived' : '✈️ Visited'}
                                   </Badge>
+                                  {location.visit_date && (
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                      {new Date(location.visit_date).toLocaleDateString()}
+                                    </span>
+                                  )}
                                   {location.overall_rating && (
                                     <StarRating value={location.overall_rating} readonly size="sm" showValue />
                                   )}
@@ -854,6 +869,7 @@ export default function ProfilePage() {
                           setModalStep('location')
                           setSelectedCountry('')
                           setSelectedCity('')
+                          setVisitDate('')
                         }}
                         variant="ghost"
                         size="sm"
@@ -920,6 +936,16 @@ export default function ProfilePage() {
                           </select>
                         </div>
                         
+                        <div>
+                          <Label className="text-base font-medium mb-3 block">Visit Date (Optional)</Label>
+                          <Input
+                            type="date"
+                            value={visitDate}
+                            onChange={(e) => setVisitDate(e.target.value)}
+                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          />
+                        </div>
+                        
                         <div className="flex gap-3 pt-4">
                           <Button
                             onClick={() => {
@@ -927,6 +953,7 @@ export default function ProfilePage() {
                               setModalStep('location')
                               setSelectedCountry('')
                               setSelectedCity('')
+                              setVisitDate('')
                             }}
                             variant="secondary"
                             className="flex-1"

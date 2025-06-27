@@ -46,6 +46,8 @@ interface UserReview {
   value_rating?: number
   overall_rating?: number
   comment?: string
+  visit_date?: string
+  created_at?: string
   profile: {
     username: string
     full_name?: string
@@ -110,12 +112,14 @@ export default function CountryPage({ params }: PageProps) {
             value_rating,
             overall_rating,
             comment,
+            visit_date,
+            created_at,
             profile:profiles(username, full_name, avatar_url),
             city:cities(name)
           `)
           .eq('country_id', countryData.id)
-          .not('overall_rating', 'is', null)
-          .order('overall_rating', { ascending: false })
+          .or('overall_rating.not.is.null,comment.not.is.null')
+          .order('created_at', { ascending: false })
           .limit(20)
 
         if (reviewsData) {
@@ -314,6 +318,11 @@ export default function CountryPage({ params }: PageProps) {
                             {review.city && (
                               <span className="text-sm text-slate-500 dark:text-slate-400">
                                 in {review.city.name}
+                              </span>
+                            )}
+                            {review.visit_date && (
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                • {new Date(review.visit_date).toLocaleDateString()}
                               </span>
                             )}
                           </div>
