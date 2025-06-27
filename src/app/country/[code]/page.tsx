@@ -23,6 +23,12 @@ interface Country {
   best_time_to_visit?: string
 }
 
+interface City {
+  id: number
+  name: string
+  country_id: number
+}
+
 interface CountryRating {
   visitor_count: number
   avg_transportation: number
