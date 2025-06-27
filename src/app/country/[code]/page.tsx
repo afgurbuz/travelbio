@@ -117,6 +117,7 @@ export default function CountryPage({ params }: PageProps) {
         console.log('Reviews error:', reviewsError)
 
         if (reviewsData) {
+          console.log('Setting reviews:', reviewsData.length, 'items')
           setReviews(reviewsData as UserReview[])
         }
 
@@ -280,9 +281,6 @@ export default function CountryPage({ params }: PageProps) {
             </Card>
           )}
 
-          {/* Debug info */}
-          {console.log('Reviews length:', reviews.length)}
-          
           {/* User Reviews */}
           {reviews.length > 0 && (
             <Card>
