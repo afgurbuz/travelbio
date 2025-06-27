@@ -46,6 +46,14 @@ interface UserLocation {
   type: 'lived' | 'visited'
   country: Country
   city?: City
+  transportation_rating?: number
+  accommodation_rating?: number
+  food_rating?: number
+  safety_rating?: number
+  activities_rating?: number
+  value_rating?: number
+  overall_rating?: number
+  comment?: string
 }
 
 export default function ProfilePage() {
@@ -57,11 +65,11 @@ export default function ProfilePage() {
   const [userLocations, setUserLocations] = useState<UserLocation[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState('')
   const [selectedCity, setSelectedCity] = useState('')
   const [locationType, setLocationType] = useState<'lived' | 'visited'>('visited')
-  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [modalStep, setModalStep] = useState<'location' | 'rating'>('location')
   const [ratings, setRatings] = useState({
     transportation: 0,
     accommodation: 0,
@@ -119,6 +127,7 @@ export default function ProfilePage() {
           city:cities(*)
         `)
         .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
       
       if (locationsData) setUserLocations(locationsData as UserLocation[])
       
@@ -287,7 +296,7 @@ export default function ProfilePage() {
 
   const handleProceedToRating = () => {
     if (!selectedCountry) return
-    setShowRatingModal(true)
+    setModalStep('rating')
   }
 
   const handleAddLocation = async () => {
@@ -321,12 +330,13 @@ export default function ProfilePage() {
             city:cities(*)
           `)
           .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
         
         if (locationsData) setUserLocations(locationsData as UserLocation[])
         
         // Reset all forms
-        setShowAddForm(false)
-        setShowRatingModal(false)
+        setShowAddModal(false)
+        setModalStep('location')
         setSelectedCountry('')
         setSelectedCity('')
         setRatings({
@@ -607,7 +617,7 @@ export default function ProfilePage() {
                     Travel Locations
                   </CardTitle>
                   <Button
-                    onClick={() => setShowAddForm(true)}
+                    onClick={() => setShowAddModal(true)}
                     className="flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
@@ -617,84 +627,8 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
 
-                {/* Add Location Form */}
-                {showAddForm && (
-                  <Card className="mb-6">
-                    <CardContent className="pt-4">
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Type
-                          </label>
-                          <select
-                            value={locationType}
-                            onChange={(e) => setLocationType(e.target.value as 'lived' | 'visited')}
-                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900"
-                          >
-                            <option value="visited">Visited</option>
-                            <option value="lived">Lived</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            Country
-                          </label>
-                          <select
-                            value={selectedCountry}
-                            onChange={(e) => setSelectedCountry(e.target.value)}
-                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900"
-                          >
-                            <option value="">Select country</option>
-                            {countries.map(country => (
-                              <option key={country.id} value={country.id}>
-                                {country.flag} {country.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                            City (Optional)
-                          </label>
-                          <select
-                            value={selectedCity}
-                            onChange={(e) => setSelectedCity(e.target.value)}
-                            disabled={!selectedCountry}
-                            className="w-full p-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 disabled:opacity-50"
-                          >
-                            <option value="">Select city</option>
-                            {cities.map(city => (
-                              <option key={city.id} value={city.id}>
-                                {city.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="flex items-end gap-2">
-                          <Button
-                            onClick={handleProceedToRating}
-                            disabled={!selectedCountry}
-                            className="flex-1"
-                          >
-                            Continue to Rating
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              setShowAddForm(false)
-                              setSelectedCountry('')
-                              setSelectedCity('')
-                            }}
-                            variant="secondary"
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
 
-                {/* Locations List */}
+                {/* Countries List */}
                 {userLocations.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -705,36 +639,125 @@ export default function ProfilePage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid gap-3">
-                    {userLocations.map(location => (
-                      <Card key={location.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
+                  <div className="space-y-6">
+                    {/* Group locations by country */}
+                    {Object.entries(
+                      userLocations.reduce((acc, location) => {
+                        const countryKey = `${location.country.id}-${location.country.name}`
+                        if (!acc[countryKey]) {
+                          acc[countryKey] = {
+                            country: location.country,
+                            locations: []
+                          }
+                        }
+                        acc[countryKey].locations.push(location)
+                        return acc
+                      }, {} as Record<string, { country: Country; locations: UserLocation[] }>)
+                    ).map(([countryKey, { country, locations }]) => (
+                      <Card key={countryKey} className="overflow-hidden">
+                        <CardHeader className="pb-3">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <span className="text-2xl">{location.country.flag}</span>
+                            <div className="flex items-center gap-3">
+                              <span className="text-3xl">{country.flag}</span>
                               <div>
-                                <div className="font-medium text-slate-900 dark:text-white">
-                                  {location.city ? location.city.name + ', ' : ''}
-                                  <Link 
-                                    href={`/country/${location.country.code.toLowerCase()}`}
-                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
-                                  >
-                                    {location.country.name}
-                                  </Link>
-                                </div>
-                                <Badge variant="secondary" className="text-xs">
-                                  {location.type}
-                                </Badge>
+                                <Link 
+                                  href={`/country/${country.code.toLowerCase()}`}
+                                  className="text-xl font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                >
+                                  {country.name}
+                                </Link>
+                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                  {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
+                                </p>
                               </div>
                             </div>
-                            <Button
-                              onClick={() => handleRemoveLocation(location.id)}
-                              variant="ghost"
-                              size="sm"
-                              className="text-slate-400 hover:text-red-500"
-                            >
-                              <X className="w-4 h-4" />
-                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="space-y-3">
+                            {locations.map(location => (
+                              <div key={location.id} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Badge variant={location.type === 'lived' ? 'default' : 'secondary'}>
+                                        {location.type === 'lived' ? '🏠 Lived' : '✈️ Visited'}
+                                      </Badge>
+                                      {location.city && (
+                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                          {location.city.name}
+                                        </span>
+                                      )}
+                                    </div>
+                                    
+                                    {/* Show ratings if available */}
+                                    {location.overall_rating && (
+                                      <div className="mb-2">
+                                        <StarRating value={location.overall_rating} readonly showValue size="sm" />
+                                      </div>
+                                    )}
+                                    
+                                    {/* Show comment if available */}
+                                    {location.comment && (
+                                      <p className="text-sm text-slate-600 dark:text-slate-400 italic mb-3">
+                                        "{location.comment}"
+                                      </p>
+                                    )}
+                                    
+                                    {/* Show detailed ratings if available */}
+                                    {(location.transportation_rating || location.accommodation_rating || location.food_rating || location.safety_rating || location.activities_rating || location.value_rating) && (
+                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                                        {location.transportation_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Transport:</span>
+                                            <StarRating value={location.transportation_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.accommodation_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Stay:</span>
+                                            <StarRating value={location.accommodation_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.food_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Food:</span>
+                                            <StarRating value={location.food_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.safety_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Safety:</span>
+                                            <StarRating value={location.safety_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.activities_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Activities:</span>
+                                            <StarRating value={location.activities_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.value_rating && (
+                                          <div className="flex items-center gap-1">
+                                            <span className="text-slate-500 dark:text-slate-400">Value:</span>
+                                            <StarRating value={location.value_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                  
+                                  <Button
+                                    onClick={() => handleRemoveLocation(location.id)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-slate-400 hover:text-red-500 ml-2"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </CardContent>
                       </Card>
@@ -744,30 +767,112 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Rating Modal */}
-            {showRatingModal && (
+            {/* Add Location Modal */}
+            {showAddModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                 <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle>Rate Your Experience</CardTitle>
+                      <CardTitle>
+                        {modalStep === 'location' ? 'Add New Location' : 'Rate Your Experience'}
+                      </CardTitle>
                       <Button
-                        onClick={() => setShowRatingModal(false)}
+                        onClick={() => {
+                          setShowAddModal(false)
+                          setModalStep('location')
+                          setSelectedCountry('')
+                          setSelectedCity('')
+                        }}
                         variant="ghost"
                         size="sm"
                       >
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      {countries.find(c => c.id === parseInt(selectedCountry))?.flag} {countries.find(c => c.id === parseInt(selectedCountry))?.name}
-                      {selectedCity && (
-                        <span> - {cities.find(c => c.id === parseInt(selectedCity))?.name}</span>
-                      )}
-                    </p>
+                    {modalStep === 'rating' && (
+                      <p className="text-slate-600 dark:text-slate-400">
+                        {countries.find(c => c.id === parseInt(selectedCountry))?.flag} {countries.find(c => c.id === parseInt(selectedCountry))?.name}
+                        {selectedCity && (
+                          <span> - {cities.find(c => c.id === parseInt(selectedCity))?.name}</span>
+                        )}
+                      </p>
+                    )}
                   </CardHeader>
                   
                   <CardContent className="space-y-6">
+                    {modalStep === 'location' ? (
+                      // Location Selection Step
+                      <div className="space-y-6">
+                        <div>
+                          <Label className="text-base font-medium mb-3 block">Type</Label>
+                          <select
+                            value={locationType}
+                            onChange={(e) => setLocationType(e.target.value as 'lived' | 'visited')}
+                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          >
+                            <option value="visited">✈️ Visited</option>
+                            <option value="lived">🏠 Lived</option>
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium mb-3 block">Country</Label>
+                          <select
+                            value={selectedCountry}
+                            onChange={(e) => setSelectedCountry(e.target.value)}
+                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                          >
+                            <option value="">Select country</option>
+                            {countries.map(country => (
+                              <option key={country.id} value={country.id}>
+                                {country.flag} {country.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <Label className="text-base font-medium mb-3 block">City (Optional)</Label>
+                          <select
+                            value={selectedCity}
+                            onChange={(e) => setSelectedCity(e.target.value)}
+                            disabled={!selectedCountry}
+                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-50"
+                          >
+                            <option value="">Select city</option>
+                            {cities.map(city => (
+                              <option key={city.id} value={city.id}>
+                                {city.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        
+                        <div className="flex gap-3 pt-4">
+                          <Button
+                            onClick={() => {
+                              setShowAddModal(false)
+                              setModalStep('location')
+                              setSelectedCountry('')
+                              setSelectedCity('')
+                            }}
+                            variant="secondary"
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={handleProceedToRating}
+                            disabled={!selectedCountry}
+                            className="flex-1"
+                          >
+                            Continue to Rating
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      // Rating Step
+                      <>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <Label className="text-base font-medium mb-3 block">Transportation</Label>
@@ -852,22 +957,24 @@ export default function ProfilePage() {
                       </p>
                     </div>
                     
-                    <div className="flex gap-3 pt-4">
-                      <Button
-                        onClick={() => setShowRatingModal(false)}
-                        variant="secondary"
-                        className="flex-1"
-                      >
-                        Skip Rating
-                      </Button>
-                      <Button
-                        onClick={handleAddLocation}
-                        disabled={saving}
-                        className="flex-1"
-                      >
-                        {saving ? 'Adding Location...' : 'Add Location'}
-                      </Button>
-                    </div>
+                      <div className="flex gap-3 pt-4">
+                        <Button
+                          onClick={() => setModalStep('location')}
+                          variant="secondary"
+                          className="flex-1"
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          onClick={handleAddLocation}
+                          disabled={saving}
+                          className="flex-1"
+                        >
+                          {saving ? 'Adding Location...' : 'Add Location'}
+                        </Button>
+                      </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </div>
