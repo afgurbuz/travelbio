@@ -1,15 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { notFound } from 'next/navigation'
+import { notFound, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { MapPin, Globe, Share2, Calendar, ArrowLeft } from 'lucide-react'
+import Navigation from '@/components/Navigation'
+import { User } from '@supabase/supabase-js'
+import { User as UserIcon, MapPin, Globe, Share2, Calendar, ArrowLeft, Edit3, Plus, Save, X, Settings, Camera, Upload, Clock, Globe2 } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import StarRating from '@/components/StarRating'
 
 interface Profile {
   id: string
@@ -47,15 +53,45 @@ interface PageProps {
   params: { username: string }
 }
 
-export default function PublicProfilePage({ params }: PageProps) {
+export default function ProfilePage({ params }: PageProps) {
+  const router = useRouter()
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [userLocations, setUserLocations] = useState<UserLocation[]>([])
+  const [countries, setCountries] = useState<Country[]>([])
+  const [cities, setCities] = useState<City[]>([])
   const [loading, setLoading] = useState(true)
   const [notFoundProfile, setNotFoundProfile] = useState(false)
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const [showEditProfile, setShowEditProfile] = useState(false)
+  const [editFullName, setEditFullName] = useState('')
+  const [editBio, setEditBio] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [selectedCountry, setSelectedCountry] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
+  const [locationType, setLocationType] = useState<'lived' | 'visited'>('visited')
+  const [modalStep, setModalStep] = useState<'location' | 'rating'>('location')
+  const [visitDate, setVisitDate] = useState('')
+  const [ratings, setRatings] = useState({
+    transportation: 0,
+    accommodation: 0,
+    food: 0,
+    safety: 0,
+    activities: 0,
+    value: 0,
+    overall: 0,
+    comment: ''
+  })
+  const [activeTab, setActiveTab] = useState<'countries' | 'timeline'>('countries')
 
   useEffect(() => {
-    const loadProfile = async () => {
+    const loadData = async () => {
       try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser()
+        setCurrentUser(user)
+
         // Load profile by username
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -70,6 +106,14 @@ export default function PublicProfilePage({ params }: PageProps) {
         }
         
         setProfile(profileData)
+        
+        // Check if this is the current user's own profile
+        const isOwn = user?.id === profileData.id
+        setIsOwnProfile(isOwn)
+        
+        // Set edit form initial values
+        setEditFullName(profileData.full_name || '')
+        setEditBio(profileData.bio || '')
 
         // Load user locations
         const { data: locationsData } = await supabase
@@ -84,6 +128,17 @@ export default function PublicProfilePage({ params }: PageProps) {
         if (locationsData) {
           setUserLocations(locationsData as UserLocation[])
         }
+
+        // Load countries and cities if this is own profile
+        if (isOwn) {
+          const [countriesResult, citiesResult] = await Promise.all([
+            supabase.from('countries').select('*').order('name'),
+            supabase.from('cities').select('*').order('name')
+          ])
+          
+          if (countriesResult.data) setCountries(countriesResult.data)
+          if (citiesResult.data) setCities(citiesResult.data)
+        }
         
         setLoading(false)
       } catch (error) {
@@ -93,7 +148,7 @@ export default function PublicProfilePage({ params }: PageProps) {
       }
     }
 
-    loadProfile()
+    loadData()
   }, [params.username])
 
   const handleShare = async () => {
