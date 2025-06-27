@@ -90,7 +90,8 @@ export default function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [activeTab, setActiveTab] = useState<'countries' | 'timeline'>('countries')
   const [visitDate, setVisitDate] = useState('')
-  const [expandedCountry, setExpandedCountry] = useState<string | null>(null)
+  const [showCountryModal, setShowCountryModal] = useState(false)
+  const [selectedCountryData, setSelectedCountryData] = useState<{country: Country; locations: UserLocation[]} | null>(null)
 
   useEffect(() => {
     const loadData = async () => {
@@ -695,94 +696,39 @@ export default function ProfilePage() {
                       const avgRating = locations.filter(l => l.overall_rating).length > 0 
                         ? locations.reduce((sum, l) => sum + (l.overall_rating || 0), 0) / locations.filter(l => l.overall_rating).length 
                         : 0
-                      const isExpanded = expandedCountry === countryKey
                       
                       return (
-                        <div key={countryKey}>
-                          <Card 
-                            className={`cursor-pointer transition-all hover:shadow-md ${isExpanded ? 'ring-2 ring-slate-300 dark:ring-slate-600' : ''}`}
-                            onClick={() => setExpandedCountry(isExpanded ? null : countryKey)}
-                          >
-                            <CardContent className="p-4 text-center">
-                              <div className="text-3xl mb-2">{country.flag}</div>
-                              <Link 
-                                href={`/country/${country.code.toLowerCase()}`}
-                                className="font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300 block mb-2"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {country.name}
-                              </Link>
-                              <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                                {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
+                        <Card 
+                          key={countryKey}
+                          className="cursor-pointer transition-all hover:shadow-md hover:scale-105 group"
+                          onClick={() => {
+                            setSelectedCountryData({country, locations})
+                            setShowCountryModal(true)
+                          }}
+                        >
+                          <CardContent className="p-4 text-center relative">
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                                Detayları gör
                               </div>
-                              {avgRating > 0 && (
-                                <div className="flex items-center justify-center gap-1">
-                                  <StarRating value={avgRating} readonly size="sm" />
-                                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                                    {avgRating.toFixed(1)}
-                                  </span>
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                          
-                          {/* Expanded Details */}
-                          {isExpanded && (
-                            <Card className="mt-2 border-slate-200 dark:border-slate-700">
-                              <CardContent className="p-4">
-                                <div className="space-y-3">
-                                  {locations.map(location => (
-                                    <div key={location.id} className="flex items-center justify-between bg-slate-50 dark:bg-slate-900 rounded-lg p-3">
-                                      <div className="flex items-start gap-3 flex-1">
-                                        <Badge 
-                                          variant={location.type === 'lived' ? 'default' : 'secondary'}
-                                          className="text-xs shrink-0"
-                                        >
-                                          {location.type === 'lived' ? '🏠' : '✈️'}
-                                        </Badge>
-                                        <div className="flex-1 min-w-0">
-                                          <div className="flex items-center gap-2 mb-1">
-                                            {location.city && (
-                                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                                                {location.city.name}
-                                              </span>
-                                            )}
-                                            {location.visit_date && (
-                                              <span className="text-xs text-slate-500 dark:text-slate-400">
-                                                {new Date(location.visit_date).getFullYear()}
-                                              </span>
-                                            )}
-                                          </div>
-                                          {location.overall_rating && (
-                                            <div className="mb-2">
-                                              <StarRating value={location.overall_rating} readonly size="sm" />
-                                            </div>
-                                          )}
-                                          {location.comment && (
-                                            <p className="text-xs text-slate-600 dark:text-slate-400 italic">
-                                              "{location.comment}"
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-                                      <Button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          handleRemoveLocation(location.id)
-                                        }}
-                                        variant="ghost"
-                                        size="sm"
-                                        className="text-slate-400 hover:text-red-500 h-6 w-6 p-0 shrink-0"
-                                      >
-                                        <X className="w-3 h-3" />
-                                      </Button>
-                                    </div>
-                                  ))}
-                                </div>
-                              </CardContent>
-                            </Card>
-                          )}
-                        </div>
+                            </div>
+                            <div className="text-3xl mb-2">{country.flag}</div>
+                            <div className="font-bold text-slate-900 dark:text-white mb-2">
+                              {country.name}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                              {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
+                            </div>
+                            {avgRating > 0 && (
+                              <div className="flex items-center justify-center gap-1">
+                                <StarRating value={avgRating} readonly size="sm" />
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                  {avgRating.toFixed(1)}
+                                </span>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
                       )
                     })}
                   </div>
@@ -841,6 +787,103 @@ export default function ProfilePage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Country Details Modal */}
+            {showCountryModal && selectedCountryData && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white dark:bg-slate-900 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{selectedCountryData.country.flag}</span>
+                      <div>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                          {selectedCountryData.country.name}
+                        </h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {selectedCountryData.locations.length} {selectedCountryData.locations.length === 1 ? 'trip' : 'trips'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link 
+                        href={`/country/${selectedCountryData.country.code.toLowerCase()}`}
+                        className="btn-secondary text-sm"
+                        onClick={() => setShowCountryModal(false)}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        Ülke Sayfası
+                      </Link>
+                      <Button
+                        onClick={() => setShowCountryModal(false)}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    {selectedCountryData.locations.map(location => (
+                      <Card key={location.id} className="bg-slate-50 dark:bg-slate-800 border-0">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3 flex-1">
+                              <Badge 
+                                variant={location.type === 'lived' ? 'default' : 'secondary'}
+                                className="text-xs shrink-0 mt-1"
+                              >
+                                {location.type === 'lived' ? '🏠 Yaşadım' : '✈️ Ziyaret'}
+                              </Badge>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  {location.city && (
+                                    <span className="font-medium text-slate-900 dark:text-white">
+                                      {location.city.name}
+                                    </span>
+                                  )}
+                                  {location.visit_date && (
+                                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                                      {new Date(location.visit_date).toLocaleDateString('tr-TR')}
+                                    </span>
+                                  )}
+                                </div>
+                                {location.overall_rating && (
+                                  <div className="mb-3">
+                                    <StarRating value={location.overall_rating} readonly showValue />
+                                  </div>
+                                )}
+                                {location.comment && (
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                                    "{location.comment}"
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => {
+                                handleRemoveLocation(location.id)
+                                // Refresh selected country data
+                                const updatedLocations = selectedCountryData.locations.filter(l => l.id !== location.id)
+                                if (updatedLocations.length === 0) {
+                                  setShowCountryModal(false)
+                                } else {
+                                  setSelectedCountryData({...selectedCountryData, locations: updatedLocations})
+                                }
+                              }}
+                              variant="ghost"
+                              size="sm"
+                              className="text-slate-400 hover:text-red-500"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Add Location Modal */}
             {showAddModal && (
