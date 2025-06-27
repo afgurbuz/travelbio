@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { Shuffle, MapPin, Globe, Users, Sparkles } from 'lucide-react'
+import { Shuffle, MapPin, Globe, Users, Sparkles, Star } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -22,10 +22,20 @@ interface Profile {
   countries_count?: number
 }
 
+interface Country {
+  id: number
+  code: string
+  name: string
+  flag: string
+  visitor_count?: number
+  avg_overall?: number
+}
+
 export default function DiscoverPage() {
   const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [profiles, setProfiles] = useState<Profile[]>([])
+  const [countries, setCountries] = useState<Country[]>([])
   const [loading, setLoading] = useState(true)
   const [shuffling, setShuffling] = useState(false)
 
@@ -50,6 +60,7 @@ export default function DiscoverPage() {
   useEffect(() => {
     if (!loading) {
       loadRandomProfiles()
+      loadPopularCountries()
     }
   }, [loading])
 
@@ -102,6 +113,40 @@ export default function DiscoverPage() {
       console.error('Error loading profiles:', error)
     } finally {
       setShuffling(false)
+    }
+  }
+
+  const loadPopularCountries = async () => {
+    try {
+      // Load countries with ratings data
+      const { data: ratingsData, error } = await supabase
+        .from('country_ratings')
+        .select(`
+          *,
+          country:countries(*)
+        `)
+        .gte('visitor_count', 1)
+        .order('visitor_count', { ascending: false })
+        .limit(10)
+
+      if (error) throw error
+
+      if (ratingsData) {
+        const countriesWithStats: Country[] = ratingsData
+          .filter((r: any) => r.country)
+          .map((r: any) => ({
+            id: r.country.id,
+            code: r.country.code,
+            name: r.country.name,
+            flag: r.country.flag,
+            visitor_count: r.visitor_count,
+            avg_overall: r.avg_overall
+          }))
+
+        setCountries(countriesWithStats)
+      }
+    } catch (error) {
+      console.error('Error loading countries:', error)
     }
   }
 
@@ -239,6 +284,56 @@ export default function DiscoverPage() {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            )}
+
+            {/* Popular Countries Section */}
+            {countries.length > 0 && (
+              <div className="mt-16">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                    Popular Destinations
+                  </h2>
+                  <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+                    Discover the most visited countries by our travel community
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {countries.map((country, index) => (
+                    <Card 
+                      key={country.id}
+                      className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md"
+                      style={{ animationDelay: `${index * 0.05}s` }}
+                    >
+                      <CardContent className="p-4">
+                        <Link 
+                          href={`/country/${country.code.toLowerCase()}`}
+                          className="block text-center space-y-3"
+                        >
+                          <div className="text-4xl mb-2">{country.flag}</div>
+                          <h3 className="font-semibold text-slate-900 dark:text-white text-sm group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+                            {country.name}
+                          </h3>
+                          
+                          <div className="space-y-2">
+                            <Badge variant="secondary" className="flex items-center gap-1 justify-center">
+                              <Users className="w-3 h-3" />
+                              {country.visitor_count}
+                            </Badge>
+                            
+                            {country.avg_overall && country.avg_overall > 0 && (
+                              <Badge variant="outline" className="flex items-center gap-1 justify-center">
+                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                {country.avg_overall.toFixed(1)}
+                              </Badge>
+                            )}
+                          </div>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             )}
 
