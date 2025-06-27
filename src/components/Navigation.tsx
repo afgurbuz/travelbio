@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Compass, User, LogOut, Globe } from 'lucide-react'
+import { Home, Compass, User, LogOut, Globe, Trophy, Map } from 'lucide-react'
 import { User as SupabaseUser } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
@@ -15,10 +15,20 @@ interface NavigationProps {
 export default function Navigation({ user, onSignOut }: NavigationProps) {
   const pathname = usePathname()
 
-  const navItems = [
+  const publicNavItems = [
     { href: '/discover', icon: Compass, label: 'Discover' },
+    { href: '/countries', icon: Map, label: 'Countries' },
+    { href: '/top-charts', icon: Trophy, label: 'Top Charts' },
+  ]
+
+  const userNavItems = [
+    { href: '/discover', icon: Compass, label: 'Discover' },
+    { href: '/countries', icon: Map, label: 'Countries' },
+    { href: '/top-charts', icon: Trophy, label: 'Top Charts' },
     { href: '/profile', icon: User, label: 'Profile' },
   ]
+
+  const navItems = user ? userNavItems : publicNavItems
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
@@ -35,29 +45,27 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
           </Link>
 
           {/* Navigation */}
-          {user && (
-            <nav className="hidden md:flex items-center space-x-2">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
-                const Icon = item.icon
-                
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    variant={isActive ? "default" : "ghost"}
-                    size="sm"
-                    className="h-9"
-                  >
-                    <Link href={item.href} className="flex items-center space-x-2">
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </Button>
-                )
-              })}
-            </nav>
-          )}
+          <nav className="hidden md:flex items-center space-x-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
+              const Icon = item.icon
+              
+              return (
+                <Button
+                  key={item.href}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  size="sm"
+                  className="h-9"
+                >
+                  <Link href={item.href} className="flex items-center space-x-2">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                </Button>
+              )
+            })}
+          </nav>
 
           {/* User Menu */}
           <div className="flex items-center space-x-3">
@@ -85,30 +93,28 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
         </div>
 
         {/* Mobile Navigation */}
-        {user && (
-          <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50">
-            <div className="grid grid-cols-2 gap-2 p-3">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
-                const Icon = item.icon
-                
-                return (
-                  <Button
-                    key={item.href}
-                    asChild
-                    variant={isActive ? "default" : "ghost"}
-                    className="h-12 flex-col space-y-1"
-                  >
-                    <Link href={item.href}>
-                      <Icon className="w-5 h-5" />
-                      <span className="text-xs font-medium">{item.label}</span>
-                    </Link>
-                  </Button>
-                )
-              })}
-            </div>
-          </nav>
-        )}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50">
+          <div className={`grid gap-1 p-3 ${user ? 'grid-cols-4' : 'grid-cols-3'}`}>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
+              const Icon = item.icon
+              
+              return (
+                <Button
+                  key={item.href}
+                  asChild
+                  variant={isActive ? "default" : "ghost"}
+                  className="h-12 flex-col space-y-1"
+                >
+                  <Link href={item.href}>
+                    <Icon className="w-5 h-5" />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </Link>
+                </Button>
+              )
+            })}
+          </div>
+        </nav>
       </div>
     </header>
   )

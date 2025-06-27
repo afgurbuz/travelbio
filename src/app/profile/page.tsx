@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
-import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, Upload, Settings } from 'lucide-react'
+import { User as UserIcon, MapPin, Save, Plus, X, Share2, ExternalLink, Edit3, Camera, Upload, Settings, Clock, Globe2 } from 'lucide-react'
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -86,6 +86,7 @@ export default function ProfilePage() {
   const [editAvatarUrl, setEditAvatarUrl] = useState('')
   const [uploading, setUploading] = useState(false)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [activeTab, setActiveTab] = useState<'countries' | 'timeline'>('countries')
 
   useEffect(() => {
     const loadData = async () => {
@@ -413,9 +414,6 @@ export default function ProfilePage() {
                     </p>
                   )}
                   
-                  <p className="text-slate-500 dark:text-slate-500 text-sm mb-4">
-                    {profile?.email}
-                  </p>
                   
                   {profile?.bio && (
                     <p className="text-slate-700 dark:text-slate-300 max-w-md mx-auto mb-6">
@@ -608,13 +606,13 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Locations Section */}
+            {/* Travel Section */}
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-4">
                   <CardTitle className="flex items-center gap-2">
                     <MapPin className="w-5 h-5" />
-                    Travel Locations
+                    My Travels
                   </CardTitle>
                   <Button
                     onClick={() => setShowAddModal(true)}
@@ -624,11 +622,37 @@ export default function ProfilePage() {
                     Add Location
                   </Button>
                 </div>
+                
+                {/* Tabs */}
+                <div className="flex gap-4 border-b border-slate-200 dark:border-slate-700">
+                  <button
+                    onClick={() => setActiveTab('countries')}
+                    className={`flex items-center gap-2 pb-3 px-1 border-b-2 transition-colors ${
+                      activeTab === 'countries'
+                        ? 'border-slate-900 dark:border-slate-100 text-slate-900 dark:text-white'
+                        : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    <Globe2 className="w-4 h-4" />
+                    Countries
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('timeline')}
+                    className={`flex items-center gap-2 pb-3 px-1 border-b-2 transition-colors ${
+                      activeTab === 'timeline'
+                        ? 'border-slate-900 dark:border-slate-100 text-slate-900 dark:text-white'
+                        : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    <Clock className="w-4 h-4" />
+                    Timeline
+                  </button>
+                </div>
               </CardHeader>
               <CardContent>
 
 
-                {/* Countries List */}
+                {/* Tab Content */}
                 {userLocations.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -638,7 +662,8 @@ export default function ProfilePage() {
                       No locations added yet. Start by adding places you've visited or lived in!
                     </p>
                   </div>
-                ) : (
+                ) : activeTab === 'countries' ? (
+                  /* Countries Tab */
                   <div className="space-y-6">
                     {/* Group locations by country */}
                     {Object.entries(
@@ -758,6 +783,53 @@ export default function ProfilePage() {
                                 </div>
                               </div>
                             ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  /* Timeline Tab */
+                  <div className="space-y-4">
+                    {userLocations.map(location => (
+                      <Card key={location.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-2xl">{location.country.flag}</span>
+                              <div>
+                                <div className="font-medium text-slate-900 dark:text-white">
+                                  {location.city ? location.city.name + ', ' : ''}
+                                  <Link 
+                                    href={`/country/${location.country.code.toLowerCase()}`}
+                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                  >
+                                    {location.country.name}
+                                  </Link>
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant={location.type === 'lived' ? 'default' : 'secondary'} className="text-xs">
+                                    {location.type === 'lived' ? '🏠 Lived' : '✈️ Visited'}
+                                  </Badge>
+                                  {location.overall_rating && (
+                                    <StarRating value={location.overall_rating} readonly size="sm" showValue />
+                                  )}
+                                </div>
+                                {location.comment && (
+                                  <p className="text-sm text-slate-600 dark:text-slate-400 italic mt-2">
+                                    "{location.comment}"
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <Button
+                              onClick={() => handleRemoveLocation(location.id)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-slate-400 hover:text-red-500"
+                            >
+                              <X className="w-4 h-4" />
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
