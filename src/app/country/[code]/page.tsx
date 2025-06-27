@@ -66,9 +66,19 @@ export default function CountryPage({ params }: PageProps) {
   const [country, setCountry] = useState<Country | null>(null)
   const [ratings, setRatings] = useState<CountryRating | null>(null)
   const [reviews, setReviews] = useState<UserReview[]>([])
+  const [filteredReviews, setFilteredReviews] = useState<UserReview[]>([])
   const [loading, setLoading] = useState(true)
   const [notFoundCountry, setNotFoundCountry] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
+  // Filter and pagination states
+  const [filterType, setFilterType] = useState<'all' | 'lived' | 'visited'>('all')
+  const [filterRating, setFilterRating] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all')
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [cities, setCities] = useState<City[]>([])
+  const [filterCity, setFilterCity] = useState<'all' | string>('all')
+  const reviewsPerPage = 10
 
   useEffect(() => {
     const loadCountryData = async () => {
@@ -138,6 +148,13 @@ export default function CountryPage({ params }: PageProps) {
             .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
           setReviews(reviewsData as UserReview[])
+          setFilteredReviews(reviewsData as UserReview[])
+          
+          // Get unique cities from reviews
+          const uniqueCities = Array.from(
+            new Set(reviewsData.filter((r: any) => r.city).map((r: any) => JSON.stringify(r.city)))
+          ).map(str => JSON.parse(str))
+          setCities(uniqueCities)
         }
 
       } catch (error) {
@@ -151,6 +168,51 @@ export default function CountryPage({ params }: PageProps) {
 
     loadCountryData()
   }, [params.code])
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let filtered = [...reviews]
+    
+    // Filter by type
+    if (filterType !== 'all') {
+      filtered = filtered.filter(review => review.type === filterType)
+    }
+    
+    // Filter by rating
+    if (filterRating !== 'all') {
+      const ratingValue = parseInt(filterRating)
+      filtered = filtered.filter(review => review.overall_rating === ratingValue)
+    }
+    
+    // Filter by city
+    if (filterCity !== 'all') {
+      filtered = filtered.filter(review => review.city?.id.toString() === filterCity)
+    }
+    
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime()
+        case 'oldest':
+          return new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()
+        case 'highest':
+          return (b.overall_rating || 0) - (a.overall_rating || 0)
+        case 'lowest':
+          return (a.overall_rating || 0) - (b.overall_rating || 0)
+        default:
+          return 0
+      }
+    })
+    
+    setFilteredReviews(filtered)
+    setCurrentPage(1) // Reset to first page when filters change
+  }, [reviews, filterType, filterRating, filterCity, sortBy])
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage)
+  const startIndex = (currentPage - 1) * reviewsPerPage
+  const paginatedReviews = filteredReviews.slice(startIndex, startIndex + reviewsPerPage)
 
   if (loading) {
     return (
@@ -324,14 +386,72 @@ export default function CountryPage({ params }: PageProps) {
           {reviews.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Traveler Reviews ({reviews.length})
-                </CardTitle>
+                <div className="flex flex-col gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Traveler Reviews ({filteredReviews.length} / {reviews.length})
+                  </CardTitle>
+                  
+                  {/* Filters */}
+                  <div className="flex flex-wrap gap-3">
+                    <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Filter type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tüm Tipler</SelectItem>
+                        <SelectItem value="lived">🏠 Yaşadım</SelectItem>
+                        <SelectItem value="visited">✈️ Ziyaret</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <Select value={filterRating} onValueChange={(value: any) => setFilterRating(value)}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Filter rating" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Tüm Puanlar</SelectItem>
+                        <SelectItem value="5">⭐ 5 Yıldız</SelectItem>
+                        <SelectItem value="4">⭐ 4 Yıldız</SelectItem>
+                        <SelectItem value="3">⭐ 3 Yıldız</SelectItem>
+                        <SelectItem value="2">⭐ 2 Yıldız</SelectItem>
+                        <SelectItem value="1">⭐ 1 Yıldız</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {cities.length > 0 && (
+                      <Select value={filterCity} onValueChange={setFilterCity}>
+                        <SelectTrigger className="w-[160px]">
+                          <SelectValue placeholder="Filter city" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Tüm Şehirler</SelectItem>
+                          {cities.map((city) => (
+                            <SelectItem key={city.id} value={city.id.toString()}>
+                              {city.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                    
+                    <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                      <SelectTrigger className="w-[140px]">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">En Yeni</SelectItem>
+                        <SelectItem value="oldest">En Eski</SelectItem>
+                        <SelectItem value="highest">En Yüksek Puan</SelectItem>
+                        <SelectItem value="lowest">En Düşük Puan</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {reviews.map((review) => (
+                  {paginatedReviews.map((review) => (
                     <div key={review.id} className="border-b border-slate-200 dark:border-slate-700 last:border-0 pb-6 last:pb-0">
                       <div className="flex items-start gap-4">
                         <Avatar>
@@ -377,6 +497,57 @@ export default function CountryPage({ params }: PageProps) {
                     </div>
                   ))}
                 </div>
+                
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-8">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                        if (
+                          page === 1 || 
+                          page === totalPages || 
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        ) {
+                          return (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setCurrentPage(page)}
+                              className="w-8 h-8 p-0"
+                            >
+                              {page}
+                            </Button>
+                          )
+                        } else if (
+                          page === currentPage - 2 || 
+                          page === currentPage + 2
+                        ) {
+                          return <span key={page} className="px-1">...</span>
+                        }
+                        return null
+                      })}
+                    </div>
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
