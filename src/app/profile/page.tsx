@@ -179,6 +179,7 @@ export default function ProfilePage() {
       }
     } else {
       navigator.clipboard.writeText(profileUrl)
+      // TODO: Replace with proper toast notification
       alert('Profile link copied to clipboard!')
     }
   }
@@ -214,6 +215,7 @@ export default function ProfilePage() {
       return data.publicUrl
     } catch (error) {
       console.error('Error uploading avatar:', error)
+      // TODO: Replace with proper toast notification
       alert('Error uploading image. Please try again.')
       return null
     } finally {
@@ -227,12 +229,14 @@ export default function ProfilePage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
+      // TODO: Replace with proper toast notification
       alert('Please select an image file')
       return
     }
 
     // Validate file size (max 1MB)
     if (file.size > 1 * 1024 * 1024) {
+      // TODO: Replace with proper toast notification
       alert('Image size must be less than 1MB')
       return
     }
@@ -286,12 +290,15 @@ export default function ProfilePage() {
         }
         
         setShowEditProfile(false)
+        // TODO: Replace with proper toast notification
         alert('Profile updated successfully!')
       } else {
+        // TODO: Replace with proper toast notification
         alert('Error updating profile: ' + error.message)
       }
     } catch (error) {
       console.error('Error updating profile:', error)
+      // TODO: Replace with proper toast notification
       alert('Error updating profile')
     } finally {
       setSaving(false)

@@ -68,6 +68,7 @@ export default function CountryPage({ params }: PageProps) {
   const [reviews, setReviews] = useState<UserReview[]>([])
   const [loading, setLoading] = useState(true)
   const [notFoundCountry, setNotFoundCountry] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const loadCountryData = async () => {
@@ -97,32 +98,51 @@ export default function CountryPage({ params }: PageProps) {
           setRatings(ratingsData)
         }
 
-        // Load user reviews with profiles
-        const { data: reviewsData, error: reviewsError } = await supabase
+        // Load user reviews with profiles - first get all locations for this country
+        const { data: allLocationsData } = await supabase
           .from('user_locations')
-          .select(`
-            id,
-            user_id,
-            type,
-            overall_rating,
-            comment,
-            created_at,
-            profile:profiles(username, full_name, avatar_url)
-          `)
+          .select('*')
           .eq('country_id', countryData.id)
-          .order('created_at', { ascending: false })
 
-        console.log('Country ID:', countryData.id)
-        console.log('Reviews data:', reviewsData)
-        console.log('Reviews error:', reviewsError)
+        if (allLocationsData && allLocationsData.length > 0) {
+          // Then get profiles for these locations
+          const userIds = [...new Set(allLocationsData.map((l: any) => l.user_id))]
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, username, full_name, avatar_url')
+            .in('id', userIds)
 
-        if (reviewsData) {
-          console.log('Setting reviews:', reviewsData.length, 'items')
+          // Get cities data
+          const cityIds = allLocationsData.filter((l: any) => l.city_id).map((l: any) => l.city_id)
+          let citiesData: any[] = []
+          if (cityIds.length > 0) {
+            const { data: cities } = await supabase
+              .from('cities')
+              .select('id, name')
+              .in('id', [...new Set(cityIds)])
+            citiesData = cities || []
+          }
+
+          // Combine data
+          const reviewsData = allLocationsData
+            .filter((location: any) => location.overall_rating || location.comment) // Only show locations with ratings or comments
+            .map((location: any) => {
+              const profile = profilesData?.find((p: any) => p.id === location.user_id)
+              const city = citiesData.find((c: any) => c.id === location.city_id)
+              return {
+                ...location,
+                profile,
+                city
+              }
+            })
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
           setReviews(reviewsData as UserReview[])
         }
 
       } catch (error) {
         console.error('Error loading country data:', error)
+        setError('Failed to load country data. Please try again.')
         setNotFoundCountry(true)
       } finally {
         setLoading(false)
@@ -136,6 +156,25 @@ export default function CountryPage({ params }: PageProps) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="spinner"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            Something went wrong
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     )
   }

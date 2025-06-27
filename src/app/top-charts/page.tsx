@@ -70,7 +70,7 @@ export default function TopChartsPage() {
             *,
             country:countries(*)
           `)
-          .gte('visitor_count', 2) // At least 2 visitors for meaningful ratings
+          .gte('visitor_count', 1) // At least 1 visitor for meaningful ratings
           .order('avg_overall', { ascending: false })
 
         if (error) throw error

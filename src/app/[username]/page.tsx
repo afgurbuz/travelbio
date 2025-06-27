@@ -109,6 +109,7 @@ export default function PublicProfilePage({ params }: PageProps) {
       }
     } else {
       navigator.clipboard.writeText(window.location.href)
+      // TODO: Replace with proper toast notification  
       alert('Profile link copied to clipboard!')
     }
   }
