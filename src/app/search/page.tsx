@@ -82,7 +82,7 @@ export default function SearchPage() {
         if (usersData) {
           // Get country counts for each user
           const usersWithCounts = await Promise.all(
-            usersData.map(async (user) => {
+            usersData.map(async (user: any) => {
               const { count } = await supabase
                 .from('user_locations')
                 .select('country_id', { count: 'exact', head: true })
@@ -107,16 +107,16 @@ export default function SearchPage() {
         if (countriesData) {
           // Get visitor counts and average ratings
           const countriesWithStats = await Promise.all(
-            countriesData.map(async (country) => {
+            countriesData.map(async (country: any) => {
               const { data: ratingsData } = await supabase
                 .from('user_locations')
                 .select('user_id, overall_rating')
                 .eq('country_id', country.id)
                 .not('overall_rating', 'is', null)
 
-              const visitorSet = new Set(ratingsData?.map(r => r.user_id) || [])
+              const visitorSet = new Set(ratingsData?.map((r: any) => r.user_id) || [])
               const avgRating = ratingsData && ratingsData.length > 0
-                ? ratingsData.reduce((sum, r) => sum + (r.overall_rating || 0), 0) / ratingsData.length
+                ? ratingsData.reduce((sum: number, r: any) => sum + (r.overall_rating || 0), 0) / ratingsData.length
                 : 0
 
               return {

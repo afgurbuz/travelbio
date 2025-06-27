@@ -72,7 +72,7 @@ export default function SearchComponent({ className = '', placeholder = 'Ülke v
 
         // Format user results
         if (usersData) {
-          usersData.forEach(user => {
+          usersData.forEach((user: any) => {
             searchResults.push({
               type: 'user',
               id: user.id,
@@ -86,7 +86,7 @@ export default function SearchComponent({ className = '', placeholder = 'Ülke v
 
         // Format country results
         if (countriesData) {
-          countriesData.forEach(country => {
+          countriesData.forEach((country: any) => {
             searchResults.push({
               type: 'country',
               id: country.id.toString(),
