@@ -106,7 +106,7 @@ export default function CountryPage({ params }: PageProps) {
 
         if (allLocationsData && allLocationsData.length > 0) {
           // Then get profiles for these locations
-          const userIds = [...new Set(allLocationsData.map((l: any) => l.user_id))]
+          const userIds = Array.from(new Set(allLocationsData.map((l: any) => l.user_id)))
           const { data: profilesData } = await supabase
             .from('profiles')
             .select('id, username, full_name, avatar_url')
@@ -119,7 +119,7 @@ export default function CountryPage({ params }: PageProps) {
             const { data: cities } = await supabase
               .from('cities')
               .select('id, name')
-              .in('id', [...new Set(cityIds)])
+              .in('id', Array.from(new Set(cityIds)))
             citiesData = cities || []
           }
 
