@@ -145,89 +145,110 @@ function SearchContent() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
+      <main className="min-h-screen bg-gray-50 dark:bg-slate-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                Arama Sonuçları
+            <div className="mb-12 text-center">
+              <div className="w-16 h-16 gradient-travel rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <Search className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="heading-lg text-gray-900 dark:text-white mb-4">
+                Search Results
               </h1>
               {query && (
-                <p className="text-slate-600 dark:text-slate-400">
-                  "{query}" için sonuçlar
+                <p className="text-gray-600 dark:text-gray-400 text-lg">
+                  Results for <span className="font-semibold text-gradient">"{query}"</span>
                 </p>
               )}
             </div>
 
             {loading ? (
               <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+                <div className="card-modern p-8 text-center">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+                  <p className="text-gray-600 dark:text-gray-400">Searching...</p>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Users Results */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                      Kullanıcılar
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 gradient-ocean rounded-xl flex items-center justify-center">
+                      <Users className="w-4 h-4 text-white" />
+                    </div>
+                    <h2 className="heading-md text-gray-900 dark:text-white">
+                      Travelers
                     </h2>
-                    <Badge variant="secondary">{userResults.length}</Badge>
+                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg">
+                      {userResults.length}
+                    </Badge>
                   </div>
 
                   {userResults.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center">
-                        <p className="text-slate-500 dark:text-slate-400">
-                          Kullanıcı bulunamadı
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="card-modern p-8 text-center">
+                      <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Users className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        No travelers found
+                      </p>
+                    </div>
                   ) : (
-                    <div className="space-y-3">
-                      {userResults.map((userResult) => (
+                    <div className="space-y-4">
+                      {userResults.map((userResult, index) => (
                         <Link
                           key={userResult.id}
                           href={`/${userResult.username}`}
-                          className="block"
+                          className="block animate-scale-in"
+                          style={{ animationDelay: `${index * 0.1}s` }}
                         >
-                          <Card className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
-                                <Avatar className="w-12 h-12">
-                                  <AvatarImage 
-                                    src={userResult.avatar_url || undefined}
-                                    alt={userResult.username}
-                                  />
-                                  <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900">
-                                    {userResult.username.charAt(0).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                  <h3 className="font-bold text-slate-900 dark:text-white">
-                                    {userResult.full_name || userResult.username}
-                                  </h3>
-                                  {userResult.full_name && (
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                                      @{userResult.username}
-                                    </p>
-                                  )}
-                                  {userResult.bio && (
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
-                                      {userResult.bio}
-                                    </p>
+                          <div className="card-travel p-6 group">
+                            <div className="flex items-center gap-4">
+                              <div className="relative">
+                                <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg">
+                                  {userResult.avatar_url ? (
+                                    <img 
+                                      src={userResult.avatar_url}
+                                      alt={userResult.username}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full gradient-ocean flex items-center justify-center text-white text-xl font-bold">
+                                      {userResult.username.charAt(0).toUpperCase()}
+                                    </div>
                                   )}
                                 </div>
-                                {userResult.country_count !== undefined && userResult.country_count > 0 && (
-                                  <Badge variant="secondary" className="flex items-center gap-1">
-                                    <MapPin className="w-3 h-3" />
-                                    {userResult.country_count}
-                                  </Badge>
+                                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full shadow-sm">
+                                  <div className="w-full h-full bg-green-500 rounded-full animate-pulse"></div>
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300">
+                                  {userResult.full_name || userResult.username}
+                                </h3>
+                                {userResult.full_name && (
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    @{userResult.username}
+                                  </p>
+                                )}
+                                {userResult.bio && (
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2">
+                                    {userResult.bio}
+                                  </p>
                                 )}
                               </div>
-                            </CardContent>
-                          </Card>
+                              {userResult.country_count !== undefined && userResult.country_count > 0 && (
+                                <div className="text-center">
+                                  <div className="text-lg font-bold text-gradient">
+                                    {userResult.country_count}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Countries</div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </Link>
                       ))}
                     </div>
@@ -236,57 +257,66 @@ function SearchContent() {
 
                 {/* Countries Results */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                      Ülkeler
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 gradient-sunset rounded-xl flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-white" />
+                    </div>
+                    <h2 className="heading-md text-gray-900 dark:text-white">
+                      Countries
                     </h2>
-                    <Badge variant="secondary">{countryResults.length}</Badge>
+                    <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg">
+                      {countryResults.length}
+                    </Badge>
                   </div>
 
                   {countryResults.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center">
-                        <p className="text-slate-500 dark:text-slate-400">
-                          Ülke bulunamadı
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="card-modern p-8 text-center">
+                      <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MapPin className="w-6 h-6 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 dark:text-gray-400">
+                        No countries found
+                      </p>
+                    </div>
                   ) : (
-                    <div className="space-y-3">
-                      {countryResults.map((country) => (
+                    <div className="space-y-4">
+                      {countryResults.map((country, index) => (
                         <Link
                           key={country.id}
                           href={`/country/${country.code.toLowerCase()}`}
-                          className="block"
+                          className="block animate-scale-in"
+                          style={{ animationDelay: `${index * 0.1}s` }}
                         >
-                          <Card className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
-                                <span className="text-4xl">{country.flag}</span>
-                                <div className="flex-1">
-                                  <h3 className="font-bold text-slate-900 dark:text-white">
-                                    {country.name}
-                                  </h3>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    {country.visitor_count !== undefined && country.visitor_count > 0 && (
-                                      <span className="text-sm text-slate-500 dark:text-slate-400">
-                                        {country.visitor_count} ziyaretçi
+                          <div className="card-travel p-6 group">
+                            <div className="flex items-center gap-4">
+                              <div className="text-5xl flag-emoji group-hover:scale-110 transition-transform duration-300">
+                                {country.flag}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors duration-300 mb-2">
+                                  {country.name}
+                                </h3>
+                                <div className="flex items-center gap-4">
+                                  {country.visitor_count !== undefined && country.visitor_count > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <Users className="w-4 h-4 text-gray-500" />
+                                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        {country.visitor_count} travelers
                                       </span>
-                                    )}
-                                    {country.avg_rating !== undefined && country.avg_rating > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        <StarRating value={country.avg_rating} readonly size="sm" />
-                                        <span className="text-sm text-slate-500 dark:text-slate-400">
-                                          {country.avg_rating}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
+                                    </div>
+                                  )}
+                                  {country.avg_rating !== undefined && country.avg_rating > 0 && (
+                                    <div className="flex items-center gap-2">
+                                      <StarRating value={country.avg_rating} readonly size="sm" />
+                                      <span className="text-sm font-medium text-yellow-600">
+                                        {country.avg_rating}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                         </Link>
                       ))}
                     </div>
@@ -297,17 +327,20 @@ function SearchContent() {
 
             {/* No results for either */}
             {!loading && query && userResults.length === 0 && countryResults.length === 0 && (
-              <Card>
-                <CardContent className="py-16 text-center">
-                  <Search className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    Sonuç bulunamadı
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400">
-                    "{query}" için sonuç bulunamadı. Farklı kelimelerle aramayı deneyin.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="card-modern p-16 text-center max-w-lg mx-auto">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="heading-md text-gray-900 dark:text-white mb-4">
+                  No Results Found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  No results found for <span className="font-semibold text-gradient">"{query}"</span>
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-500">
+                  Try different keywords or check your spelling
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -319,8 +352,11 @@ function SearchContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="card-modern p-8 text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading search...</p>
+        </div>
       </div>
     }>
       <SearchContent />

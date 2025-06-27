@@ -398,79 +398,79 @@ export default function ProfilePage() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="min-h-screen bg-gray-50 dark:bg-slate-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
             {/* Header */}
-            <Card className="mb-8">
-              <CardContent className="pt-8">
-                <div className="text-center">
-                  <div className="relative inline-block mb-6">
-                    <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-                      <AvatarImage 
-                        src={profile?.avatar_url || undefined} 
-                        alt={profile?.username}
-                        className="object-cover"
+            <div className="card-modern mb-12 p-8 text-center relative overflow-hidden">
+              {/* Background decoration */}
+              <div className="absolute top-0 left-0 w-full h-2 gradient-travel"></div>
+              
+              <div className="relative z-10">
+                <div className="relative inline-block mb-6">
+                  <div className="w-32 h-32 rounded-3xl overflow-hidden shadow-2xl ring-4 ring-white dark:ring-gray-800">
+                    {profile?.avatar_url ? (
+                      <img 
+                        src={profile.avatar_url} 
+                        alt={profile.username}
+                        className="w-full h-full object-cover"
                       />
-                      <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-2xl font-bold">
-                        {profile?.username?.charAt(0).toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  
-                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                    {profile?.full_name || profile?.username || 'Your Profile'}
-                  </h1>
-                  
-                  {profile?.full_name && (
-                    <p className="text-slate-600 dark:text-slate-400 mb-2">
-                      @{profile?.username}
-                    </p>
-                  )}
-                  
-                  
-                  {profile?.bio && (
-                    <p className="text-slate-700 dark:text-slate-300 max-w-md mx-auto mb-6">
-                      {profile.bio}
-                    </p>
-                  )}
-                  
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <Button
-                      onClick={() => setShowEditProfile(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <Settings className="w-4 h-4" />
-                      Edit Profile
-                    </Button>
-                    <Button
-                      onClick={handleShare}
-                      variant="secondary"
-                      className="flex items-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      Share
-                    </Button>
-                    {profile?.username && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className="flex items-center gap-2"
-                      >
-                        <a
-                          href={`/${profile.username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Public
-                        </a>
-                      </Button>
+                    ) : (
+                      <div className="w-full h-full gradient-ocean flex items-center justify-center text-white text-4xl font-bold">
+                        {profile?.username?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
                     )}
                   </div>
+                  <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 border-4 border-white dark:border-gray-800 rounded-full shadow-lg">
+                    <div className="w-full h-full bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+                
+                <h1 className="heading-lg text-gray-900 dark:text-white mb-3">
+                  {profile?.full_name || profile?.username || 'Your Profile'}
+                </h1>
+                
+                {profile?.full_name && (
+                  <p className="text-gray-500 dark:text-gray-400 text-lg mb-3">
+                    @{profile?.username}
+                  </p>
+                )}
+                
+                {profile?.bio && (
+                  <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 text-lg leading-relaxed">
+                    {profile.bio}
+                  </p>
+                )}
+                
+                <div className="flex flex-wrap justify-center gap-4">
+                  <button
+                    onClick={() => setShowEditProfile(true)}
+                    className="btn-travel mobile-touch"
+                  >
+                    <Settings className="w-5 h-5 mr-2" />
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="btn-travel bg-white text-gray-900 hover:bg-gray-50 border border-gray-200 shadow-lg mobile-touch"
+                  >
+                    <Share2 className="w-5 h-5 mr-2" />
+                    Share
+                  </button>
+                  {profile?.username && (
+                    <a
+                      href={`/${profile.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-travel bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 mobile-touch"
+                    >
+                      <ExternalLink className="w-5 h-5 mr-2" />
+                      View Public
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Edit Profile Modal */}
             {showEditProfile && (
