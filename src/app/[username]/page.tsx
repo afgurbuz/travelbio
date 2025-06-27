@@ -67,6 +67,7 @@ export default function PublicProfilePage({ params }: PageProps) {
   const [loading, setLoading] = useState(true)
   const [notFoundProfile, setNotFoundProfile] = useState(false)
   const [activeTab, setActiveTab] = useState<'countries' | 'timeline'>('countries')
+  const [expandedCountry, setExpandedCountry] = useState<string | null>(null)
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -266,8 +267,8 @@ export default function PublicProfilePage({ params }: PageProps) {
                   </p>
                 </div>
               ) : activeTab === 'countries' ? (
-                /* Countries Tab - Compact Grid Layout */
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                /* Countries Tab - Click to Expand */
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                   {/* Group locations by country */}
                   {Object.entries(
                     userLocations.reduce((acc, location) => {
@@ -285,74 +286,83 @@ export default function PublicProfilePage({ params }: PageProps) {
                     const avgRating = locations.filter(l => l.overall_rating).length > 0 
                       ? locations.reduce((sum, l) => sum + (l.overall_rating || 0), 0) / locations.filter(l => l.overall_rating).length 
                       : 0
+                    const isExpanded = expandedCountry === countryKey
                     
                     return (
-                      <Card key={countryKey} className="h-fit">
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-3 mb-3">
-                            <span className="text-2xl">{country.flag}</span>
-                            <div className="flex-1">
-                              <Link 
-                                href={`/country/${country.code.toLowerCase()}`}
-                                className="font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300"
-                              >
-                                {country.name}
-                              </Link>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
-                                  {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
-                                </span>
-                                {avgRating > 0 && (
-                                  <div className="flex items-center gap-1">
-                                    <StarRating value={avgRating} readonly size="sm" />
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                                      {avgRating.toFixed(1)}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
+                      <div key={countryKey}>
+                        <Card 
+                          className={`cursor-pointer transition-all hover:shadow-md ${isExpanded ? 'ring-2 ring-slate-300 dark:ring-slate-600' : ''}`}
+                          onClick={() => setExpandedCountry(isExpanded ? null : countryKey)}
+                        >
+                          <CardContent className="p-4 text-center">
+                            <div className="text-3xl mb-2">{country.flag}</div>
+                            <Link 
+                              href={`/country/${country.code.toLowerCase()}`}
+                              className="font-bold text-slate-900 dark:text-white hover:underline hover:text-slate-600 dark:hover:text-slate-300 block mb-2"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {country.name}
+                            </Link>
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                              {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
                             </div>
-                          </div>
-                          
-                          {/* Compact trip list */}
-                          <div className="space-y-2">
-                            {locations.map(location => (
-                              <div key={location.id} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-2">
-                                <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <Badge 
-                                    variant={location.type === 'lived' ? 'default' : 'secondary'}
-                                    className="text-xs shrink-0"
-                                  >
-                                    {location.type === 'lived' ? '🏠' : '✈️'}
-                                  </Badge>
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-1">
-                                      {location.city && (
-                                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                                          {location.city.name}
-                                        </span>
-                                      )}
-                                      {location.visit_date && (
-                                        <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
-                                          {new Date(location.visit_date).getFullYear()}
-                                        </span>
-                                      )}
-                                    </div>
-                                    {location.overall_rating && (
-                                      <StarRating value={location.overall_rating} readonly size="sm" />
-                                    )}
-                                    {location.comment && (
-                                      <p className="text-xs text-slate-600 dark:text-slate-400 italic mt-1 line-clamp-2">
-                                        "{location.comment}"
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
+                            {avgRating > 0 && (
+                              <div className="flex items-center justify-center gap-1">
+                                <StarRating value={avgRating} readonly size="sm" />
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                  {avgRating.toFixed(1)}
+                                </span>
                               </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
+                            )}
+                          </CardContent>
+                        </Card>
+                        
+                        {/* Expanded Details */}
+                        {isExpanded && (
+                          <Card className="mt-2 border-slate-200 dark:border-slate-700">
+                            <CardContent className="p-4">
+                              <div className="space-y-3">
+                                {locations.map(location => (
+                                  <div key={location.id} className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3">
+                                    <div className="flex items-start gap-3">
+                                      <Badge 
+                                        variant={location.type === 'lived' ? 'default' : 'secondary'}
+                                        className="text-xs shrink-0"
+                                      >
+                                        {location.type === 'lived' ? '🏠' : '✈️'}
+                                      </Badge>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          {location.city && (
+                                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                              {location.city.name}
+                                            </span>
+                                          )}
+                                          {location.visit_date && (
+                                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                                              {new Date(location.visit_date).getFullYear()}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {location.overall_rating && (
+                                          <div className="mb-2">
+                                            <StarRating value={location.overall_rating} readonly size="sm" />
+                                          </div>
+                                        )}
+                                        {location.comment && (
+                                          <p className="text-xs text-slate-600 dark:text-slate-400 italic">
+                                            "{location.comment}"
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
                     )
                   })}
                 </div>
