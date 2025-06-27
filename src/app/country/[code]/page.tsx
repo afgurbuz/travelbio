@@ -157,11 +157,11 @@ export default function CountryPage({ params }: PageProps) {
           setFilteredReviews(reviewsData as UserReview[])
           
           // Get unique cities from reviews
-          const cityStrings = reviewsData
+          const cityStrings: string[] = reviewsData
             .filter((r: any) => r.city)
             .map((r: any) => JSON.stringify(r.city))
-          const uniqueCityStrings = Array.from(new Set(cityStrings))
-          const uniqueCities = uniqueCityStrings.map(str => JSON.parse(str) as City)
+          const uniqueCityStrings: string[] = Array.from(new Set(cityStrings))
+          const uniqueCities: City[] = uniqueCityStrings.map((str: string) => JSON.parse(str))
           setCities(uniqueCities)
         }
 
