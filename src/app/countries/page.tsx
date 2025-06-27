@@ -76,15 +76,15 @@ export default function CountriesPage() {
                 .eq('country_id', country.id)
 
               const visitorCount = locationsData 
-                ? new Set(locationsData.map(l => l.user_id)).size 
+                ? new Set(locationsData.map((l: any) => l.user_id)).size 
                 : 0
 
               const tripCount = locationsData?.length || 0
 
               // Calculate average rating
-              const ratingsData = locationsData?.filter(l => l.overall_rating) || []
+              const ratingsData = locationsData?.filter((l: any) => l.overall_rating) || []
               const avgRating = ratingsData.length > 0
-                ? ratingsData.reduce((sum, l) => sum + (l.overall_rating || 0), 0) / ratingsData.length
+                ? ratingsData.reduce((sum: number, l: any) => sum + (l.overall_rating || 0), 0) / ratingsData.length
                 : 0
 
               return {
