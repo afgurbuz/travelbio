@@ -60,6 +60,7 @@ interface UserReview {
     avatar_url?: string
   }
   city?: {
+    id: number
     name: string
   }
 }
