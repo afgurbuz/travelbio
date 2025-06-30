@@ -35,43 +35,50 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
   const [showMobileSearch, setShowMobileSearch] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/discover" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-              <Globe className="w-6 h-6 text-white dark:text-slate-900" />
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-200">
+              <Globe className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
               TravelBio
             </span>
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:block flex-1 max-w-md mx-4">
-            <SearchComponent />
+          <div className="hidden md:block flex-1 max-w-lg mx-8">
+            <div className="relative">
+              <SearchComponent />
+            </div>
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-2">
+          <nav className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
               const Icon = item.icon
               
               return (
-                <Button
+                <Link
                   key={item.href}
-                  asChild
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  className="h-9"
+                  href={item.href}
+                  className={`nav-item relative px-4 py-2 rounded-lg transition-colors ${
+                    isActive 
+                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
                 >
-                  <Link href={item.href} className="flex items-center space-x-2">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                </Button>
+                  <div className="flex items-center space-x-2">
+                    <Icon className="w-5 h-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                  {isActive && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-full" />
+                  )}
+                </Link>
               )
             })}
           </nav>
@@ -89,23 +96,29 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
             </Button>
             
             {user ? (
-              <Button
-                onClick={onSignOut}
-                variant="ghost"
-                size="sm"
-                className="h-9"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">Sign Out</span>
-              </Button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={onSignOut}
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline font-medium">Sign Out</span>
+                </button>
+              </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/auth/signin">Sign In</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/auth/signup">Sign Up</Link>
-                </Button>
+                <Link
+                  href="/auth/signin"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/auth/signup"
+                  className="btn-facebook"
+                >
+                  Sign Up
+                </Link>
               </div>
             )}
           </div>
@@ -120,24 +133,25 @@ export default function Navigation({ user, onSignOut }: NavigationProps) {
       </div>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-800/50">
-        <div className={`grid gap-1 p-3 ${user ? 'grid-cols-4' : 'grid-cols-3'}`}>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className={`grid gap-1 p-2 ${user ? 'grid-cols-4' : 'grid-cols-3'}`}>
           {navItems.map((item) => {
             const isActive = pathname === item.href || (pathname === '/' && item.href === '/discover')
             const Icon = item.icon
             
             return (
-              <Button
+              <Link
                 key={item.href}
-                asChild
-                variant={isActive ? "default" : "ghost"}
-                className="h-12 flex-col space-y-1"
+                href={item.href}
+                className={`flex flex-col items-center space-y-1 py-2 px-3 rounded-lg transition-colors ${
+                  isActive 
+                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' 
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
               >
-                <Link href={item.href}>
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs font-medium">{item.label}</span>
-                </Link>
-              </Button>
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
             )
           })}
         </div>

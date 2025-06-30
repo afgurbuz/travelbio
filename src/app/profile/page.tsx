@@ -398,79 +398,96 @@ export default function ProfilePage() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
           <div className="animate-fade-in">
-            {/* Header */}
-            <Card className="mb-8">
-              <CardContent className="pt-8">
-                <div className="text-center">
-                  <div className="relative inline-block mb-6">
-                    <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
-                      <AvatarImage 
-                        src={profile?.avatar_url || undefined} 
-                        alt={profile?.username}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-2xl font-bold">
-                        {profile?.username?.charAt(0).toUpperCase() || '?'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
+            {/* Profile Header - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+              {/* Cover Photo Area */}
+              <div className="h-48 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg relative">
+                <div className="absolute bottom-0 left-0 right-0 p-6">
+                  <div className="flex items-end space-x-4">
+                    {/* Profile Picture */}
+                    <div className="relative">
+                      <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
+                        <AvatarImage 
+                          src={profile?.avatar_url || undefined} 
+                          alt={profile?.username}
+                          className="object-cover"
+                        />
+                        <AvatarFallback className="bg-blue-600 text-white text-3xl font-bold">
+                          {profile?.username?.charAt(0).toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <button className="absolute bottom-2 right-2 w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
+                        <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      </button>
+                    </div>
+                    
+                    {/* Profile Info */}
+                    <div className="flex-1 pb-4">
+                      <h1 className="text-3xl font-bold text-white mb-1">
+                        {profile?.full_name || profile?.username || 'Your Profile'}
+                      </h1>
                   
-                  <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                    {profile?.full_name || profile?.username || 'Your Profile'}
-                  </h1>
-                  
-                  {profile?.full_name && (
-                    <p className="text-slate-600 dark:text-slate-400 mb-2">
-                      @{profile?.username}
-                    </p>
-                  )}
-                  
-                  
-                  {profile?.bio && (
-                    <p className="text-slate-700 dark:text-slate-300 max-w-md mx-auto mb-6">
-                      {profile.bio}
-                    </p>
-                  )}
-                  
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <Button
-                      onClick={() => setShowEditProfile(true)}
-                      className="flex items-center gap-2"
-                    >
-                      <Settings className="w-4 h-4" />
-                      Edit Profile
-                    </Button>
-                    <Button
-                      onClick={handleShare}
-                      variant="secondary"
-                      className="flex items-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      Share
-                    </Button>
-                    {profile?.username && (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className="flex items-center gap-2"
-                      >
-                        <a
-                          href={`/${profile.username}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          View Public
-                        </a>
-                      </Button>
-                    )}
+                      {profile?.full_name && (
+                        <p className="text-blue-100 mb-1">
+                          @{profile?.username}
+                        </p>
+                      )}
+                      
+                      <div className="flex items-center space-x-4 text-blue-100 text-sm">
+                        <span className="flex items-center gap-1">
+                          <Globe2 className="w-4 h-4" />
+                          {userLocations.filter((l, i, arr) => arr.findIndex(x => x.country_id === l.country_id) === i).length} countries
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {userLocations.length} places
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              
+              {/* Profile Info and Actions */}
+              <div className="p-6">
+                {profile?.bio && (
+                  <p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
+                    {profile.bio}
+                  </p>
+                )}
+                
+                <div className="flex justify-center space-x-3">
+                  <button
+                    onClick={() => setShowEditProfile(true)}
+                    className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Edit Profile
+                  </button>
+                  <button
+                    onClick={handleShare}
+                    className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Share
+                  </button>
+                  {profile?.username && (
+                    <a
+                      href={`/${profile.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View Public
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Edit Profile Modal */}
             {showEditProfile && (
@@ -620,65 +637,77 @@ export default function ProfilePage() {
               </div>
             )}
 
-            {/* Travel Section */}
-            <Card>
-              <CardHeader>
+            {/* Travel Section - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    My Travels
-                  </CardTitle>
-                  <Button
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-blue-600" />
+                    Travel Experiences
+                  </h2>
+                  <button
                     onClick={() => setShowAddModal(true)}
-                    className="flex items-center gap-2"
+                    className="btn-facebook"
                   >
                     <Plus className="w-4 h-4" />
-                    Add Location
-                  </Button>
+                    Add Experience
+                  </button>
                 </div>
                 
-                {/* Tabs */}
-                <div className="flex gap-4 border-b border-slate-200 dark:border-slate-700">
+                {/* Facebook-style Tabs */}
+                <div className="flex gap-1">
                   <button
                     onClick={() => setActiveTab('countries')}
-                    className={`flex items-center gap-2 pb-3 px-1 border-b-2 transition-colors ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                       activeTab === 'countries'
-                        ? 'border-slate-900 dark:border-slate-100 text-slate-900 dark:text-white'
-                        : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
-                    <Globe2 className="w-4 h-4" />
-                    Countries
+                    <div className="flex items-center gap-2">
+                      <Globe2 className="w-4 h-4" />
+                      Countries
+                    </div>
                   </button>
                   <button
                     onClick={() => setActiveTab('timeline')}
-                    className={`flex items-center gap-2 pb-3 px-1 border-b-2 transition-colors ${
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                       activeTab === 'timeline'
-                        ? 'border-slate-900 dark:border-slate-100 text-slate-900 dark:text-white'
-                        : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                     }`}
                   >
-                    <Clock className="w-4 h-4" />
-                    Timeline
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Timeline
+                    </div>
                   </button>
                 </div>
-              </CardHeader>
-              <CardContent>
-
-
+              </div>
+              <div className="p-6">
                 {/* Tab Content */}
                 {userLocations.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <MapPin className="w-8 h-8 text-slate-400" />
+                  <div className="text-center py-16">
+                    <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <MapPin className="w-10 h-10 text-gray-400" />
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400">
-                      No locations added yet. Start by adding places you've visited or lived in!
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      No travel experiences yet
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                      Start sharing your travel journey with the world!
                     </p>
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="btn-facebook"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Your First Experience
+                    </button>
                   </div>
                 ) : activeTab === 'countries' ? (
-                  /* Countries Tab - Click to Expand */
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  /* Countries Tab - Facebook Card Style */
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {/* Group locations by country */}
                     {Object.entries(
                       userLocations.reduce((acc, location) => {

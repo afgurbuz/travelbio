@@ -329,47 +329,44 @@ export default function TopChartsPage() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Most Visited */}
-            <Card className="mb-12">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Users className="w-6 h-6 text-blue-500" />
+            {/* Most Visited - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+                  <Users className="w-5 h-5 text-blue-500" />
                   Most Visited Countries
-                </CardTitle>
-                <p className="text-slate-600 dark:text-slate-400">
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
                   Popular destinations with the most traveler reviews
                 </p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {mostVisited.slice(0, 5).map((country, index) => (
-                    <Card key={country.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4 text-center">
-                        <Link 
-                          href={`/country/${country.code.toLowerCase()}`}
-                          className="block group"
-                        >
-                          <div className="mb-3">{getRankMedal(index + 1)}</div>
-                          <div className="text-4xl mb-3">{country.flag}</div>
-                          <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors mb-2">
-                            {country.name}
-                          </h3>
-                          <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
-                            {country.visitor_count}
-                          </div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">
-                            travelers
-                          </div>
-                        </Link>
-                      </CardContent>
-                    </Card>
+                    <Link 
+                      key={country.id}
+                      href={`/country/${country.code.toLowerCase()}`}
+                      className="block p-4 text-center rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="mb-3">{getRankMedal(index + 1)}</div>
+                      <div className="text-4xl mb-3">{country.flag}</div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                        {country.name}
+                      </h3>
+                      <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                        {country.visitor_count}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        travelers
+                      </div>
+                    </Link>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Category Rankings - Each category gets its own section */}
             <div className="space-y-12">

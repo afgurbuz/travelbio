@@ -169,192 +169,179 @@ export default function DiscoverPage() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
           <div className="animate-fade-in">
-            {/* Header */}
-            <div className="text-center mb-16">
-              <div className="relative mx-auto mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
-                  <Sparkles className="w-10 h-10 text-white dark:text-slate-900" />
+            {/* Header - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-8 h-8 text-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full animate-pulse"></div>
+                
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                  Discover Fellow Travelers
+                </h1>
+                
+                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+                  Connect with travelers from around the world and get inspired for your next adventure.
+                </p>
+                
+                <button
+                  onClick={handleShuffle}
+                  disabled={shuffling}
+                  className="btn-facebook"
+                >
+                  <Shuffle className="w-5 h-5" />
+                  {shuffling ? 'Finding new travelers...' : 'Discover New Travelers'}
+                </button>
               </div>
-              
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-6">
-                Discover Travelers
-              </h1>
-              
-              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
-                Explore travel stories from around the world and get inspired for your next adventure. 
-                Connect with fellow explorers and discover hidden gems.
-              </p>
-              
-              <Button
-                onClick={handleShuffle}
-                disabled={shuffling}
-                size="lg"
-                className="px-8 py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Shuffle className="w-5 h-5 mr-2" />
-                {shuffling ? 'Finding new travelers...' : 'Discover New Travelers'}
-              </Button>
             </div>
 
-            {/* Profiles Grid */}
+            {/* Profiles Grid - Facebook Feed Style */}
             {profiles.length === 0 ? (
-              <Card className="max-w-md mx-auto p-8 text-center border-dashed">
-                <CardContent className="pt-6">
-                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="w-8 h-8 text-slate-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    No travelers found
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">
-                    Be the first to add your travel experiences!
-                  </p>
-                  {user ? (
-                    <Button asChild>
-                      <Link href="/profile">Add Your Travels</Link>
-                    </Button>
-                  ) : (
-                    <Button asChild>
-                      <Link href="/auth/signup">Join TravelBio</Link>
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  No travelers found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  Be the first to add your travel experiences!
+                </p>
+                {user ? (
+                  <Link href="/profile" className="btn-facebook">
+                    Add Your Travels
+                  </Link>
+                ) : (
+                  <Link href="/auth/signup" className="btn-facebook">
+                    Join TravelBio
+                  </Link>
+                )}
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {profiles.map((profile, index) => (
-                  <Card 
+                  <div 
                     key={profile.id}
-                    className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md"
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   >
-                    <CardContent className="p-6">
-                      <Link href={`/${profile.username}`} className="block">
-                        <div className="text-center space-y-4">
-                          {/* Avatar */}
-                          <div className="relative mx-auto w-fit">
-                            <Avatar className="w-16 h-16 border-2 border-white shadow-md">
-                              <AvatarImage 
-                                src={profile.avatar_url || undefined} 
-                                alt={profile.username}
-                                className="object-cover"
-                              />
-                              <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900 text-lg font-bold">
-                                {profile.username.charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
-                          </div>
-                          
-                          {/* Name & Username */}
-                          <div>
-                            <h3 className="font-semibold text-slate-900 dark:text-white text-lg mb-1">
-                              {profile.full_name || profile.username}
-                            </h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm">
-                              @{profile.username}
-                            </p>
-                          </div>
+                    <Link href={`/${profile.username}`} className="block p-6">
+                      <div className="flex items-start space-x-4">
+                        {/* Avatar */}
+                        <div className="relative flex-shrink-0">
+                          <Avatar className="w-16 h-16">
+                            <AvatarImage 
+                              src={profile.avatar_url || undefined} 
+                              alt={profile.username}
+                              className="object-cover"
+                            />
+                            <AvatarFallback className="bg-blue-600 text-white text-lg font-bold">
+                              {profile.username.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
+                        </div>
+                        
+                        {/* Profile Info */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-1 truncate">
+                            {profile.full_name || profile.username}
+                          </h3>
+                          <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">
+                            @{profile.username}
+                          </p>
                           
                           {/* Bio */}
                           {profile.bio && (
-                            <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 px-2">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
                               {profile.bio}
                             </p>
                           )}
                           
                           {/* Stats */}
-                          <div className="flex justify-center gap-3">
-                            <Badge variant="secondary" className="flex items-center gap-1">
-                              <Globe className="w-3 h-3" />
-                              {profile.countries_count}
-                            </Badge>
-                            <Badge variant="secondary" className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {profile.location_count}
-                            </Badge>
+                          <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-1">
+                              <Globe className="w-4 h-4" />
+                              <span>{profile.countries_count} countries</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              <span>{profile.location_count} places</span>
+                            </div>
                           </div>
                         </div>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                      </div>
+                    </Link>
+                  </div>
                 ))}
               </div>
             )}
 
-            {/* Popular Countries Section */}
+            {/* Popular Countries Section - Facebook Style */}
             {countries.length > 0 && (
-              <div className="mt-16">
-                <div className="text-center mb-12">
-                  <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                    Popular Destinations
-                  </h2>
-                  <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                    Discover the most visited countries by our travel community
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                  {countries.map((country, index) => (
-                    <Card 
-                      key={country.id}
-                      className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
-                      <CardContent className="p-4">
-                        <Link 
-                          href={`/country/${country.code.toLowerCase()}`}
-                          className="block text-center space-y-3"
-                        >
-                          <div className="text-4xl mb-2">{country.flag}</div>
-                          <h3 className="font-semibold text-slate-900 dark:text-white text-sm group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
+              <div className="mt-6">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      Popular Destinations
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Discover the most visited countries by our travel community
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {countries.map((country, index) => (
+                      <Link 
+                        key={country.id}
+                        href={`/country/${country.code.toLowerCase()}`}
+                        className="block p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <div className="text-center space-y-3">
+                          <div className="text-3xl">{country.flag}</div>
+                          <h3 className="font-medium text-gray-900 dark:text-white text-sm">
                             {country.name}
                           </h3>
                           
-                          <div className="space-y-2">
-                            <Badge variant="secondary" className="flex items-center gap-1 justify-center">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                               <Users className="w-3 h-3" />
-                              {country.visitor_count}
-                            </Badge>
+                              <span>{country.visitor_count} travelers</span>
+                            </div>
                             
                             {country.avg_overall && country.avg_overall > 0 && (
-                              <Badge variant="outline" className="flex items-center gap-1 justify-center">
+                              <div className="flex items-center justify-center gap-1 text-xs text-yellow-600">
                                 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                {country.avg_overall.toFixed(1)}
-                              </Badge>
+                                <span>{country.avg_overall.toFixed(1)}</span>
+                              </div>
                             )}
                           </div>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Bottom CTA */}
+            {/* Bottom CTA - Facebook Style */}
             {!user && profiles.length > 0 && (
-              <Card className="mt-16 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-0">
-                <CardContent className="text-center py-12">
-                  <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                    Ready to share your story?
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg max-w-md mx-auto">
-                    Join TravelBio and create your own travel profile to connect with fellow explorers.
-                  </p>
-                  <Button asChild size="lg" className="px-8 py-3 text-lg">
-                    <Link href="/auth/signup">
-                      <Globe className="w-5 h-5 mr-2" />
-                      Start Your Journey
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Ready to share your story?
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                  Join TravelBio and create your own travel profile to connect with fellow explorers.
+                </p>
+                <Link href="/auth/signup" className="btn-facebook">
+                  <Globe className="w-5 h-5" />
+                  Start Your Journey
+                </Link>
+              </div>
             )}
           </div>
         </div>

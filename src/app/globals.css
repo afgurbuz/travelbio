@@ -3,45 +3,57 @@
 @tailwind utilities;
 
 :root {
-  --background: 255 255 255;
-  --foreground: 15 23 42;
+  --background: 240 242 247;
+  --foreground: 28 30 33;
   --card: 255 255 255;
-  --card-foreground: 15 23 42;
-  --primary: 15 23 42;
-  --primary-foreground: 248 250 252;
-  --secondary: 248 250 252;
-  --secondary-foreground: 15 23 42;
-  --muted: 241 245 249;
-  --muted-foreground: 100 116 139;
-  --accent: 241 245 249;
-  --accent-foreground: 15 23 42;
-  --destructive: 239 68 68;
-  --destructive-foreground: 248 250 252;
-  --border: 226 232 240;
-  --input: 226 232 240;
-  --ring: 148 163 184;
+  --card-foreground: 28 30 33;
+  --primary: 24 119 242;
+  --primary-foreground: 255 255 255;
+  --secondary: 236 239 241;
+  --secondary-foreground: 28 30 33;
+  --muted: 240 242 247;
+  --muted-foreground: 101 103 107;
+  --accent: 66 103 178;
+  --accent-foreground: 255 255 255;
+  --destructive: 244 67 54;
+  --destructive-foreground: 255 255 255;
+  --border: 218 221 225;
+  --input: 255 255 255;
+  --ring: 24 119 242;
   --radius: 0.5rem;
+  --facebook-blue: 24 119 242;
+  --facebook-blue-dark: 66 103 178;
+  --facebook-green: 66 183 42;
+  --facebook-gray: 240 242 247;
+  --facebook-dark-gray: 101 103 107;
+  --facebook-border: 218 221 225;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: 2 6 23;
-    --foreground: 248 250 252;
-    --card: 15 23 42;
-    --card-foreground: 248 250 252;
-    --primary: 248 250 252;
-    --primary-foreground: 15 23 42;
-    --secondary: 30 41 59;
-    --secondary-foreground: 248 250 252;
-    --muted: 30 41 59;
-    --muted-foreground: 148 163 184;
-    --accent: 30 41 59;
-    --accent-foreground: 248 250 252;
-    --destructive: 220 38 38;
-    --destructive-foreground: 248 250 252;
-    --border: 30 41 59;
-    --input: 30 41 59;
-    --ring: 148 163 184;
+    --background: 24 25 26;
+    --foreground: 231 233 236;
+    --card: 36 37 38;
+    --card-foreground: 231 233 236;
+    --primary: 88 166 255;
+    --primary-foreground: 255 255 255;
+    --secondary: 58 59 60;
+    --secondary-foreground: 231 233 236;
+    --muted: 42 43 44;
+    --muted-foreground: 178 179 180;
+    --accent: 88 166 255;
+    --accent-foreground: 255 255 255;
+    --destructive: 244 67 54;
+    --destructive-foreground: 255 255 255;
+    --border: 58 59 60;
+    --input: 58 59 60;
+    --ring: 88 166 255;
+    --facebook-blue: 88 166 255;
+    --facebook-blue-dark: 66 103 178;
+    --facebook-green: 66 183 42;
+    --facebook-gray: 42 43 44;
+    --facebook-dark-gray: 178 179 180;
+    --facebook-border: 58 59 60;
   }
 }
 
@@ -64,7 +76,8 @@ body {
 body {
   color: rgb(var(--foreground));
   background: rgb(var(--background));
-  line-height: 1.6;
+  line-height: 1.5;
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 }
 
 a {
@@ -136,30 +149,72 @@ a {
   }
 }
 
-/* Clean button styles */
+/* Facebook-style button styles */
 .btn-primary {
-  @apply bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-200 px-4 py-2 rounded-lg font-medium transition-colors;
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
 }
 
 .btn-secondary {
-  @apply bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-lg font-medium transition-colors;
+  @apply bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500 px-6 py-2 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md active:scale-95;
 }
 
 .btn-ghost {
-  @apply text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2 rounded-lg font-medium transition-colors;
+  @apply text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 px-4 py-2 rounded-md font-medium transition-all duration-200 active:scale-95;
 }
 
-/* Clean input styles */
+.btn-facebook {
+  @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-md font-semibold transition-all duration-200 shadow-sm hover:shadow-md active:scale-95 flex items-center justify-center gap-2;
+}
+
+/* Facebook-style input styles */
 .input {
-  @apply w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-transparent transition-all;
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all;
 }
 
-/* Clean card styles */
+.search-input {
+  @apply w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all;
+}
+
+/* Facebook-style card styles */
 .card {
-  @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6;
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200;
 }
 
-/* Hover effects */
+.feed-card {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mb-4;
+}
+
+.profile-card {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-4;
+}
+
+/* Facebook-style hover effects */
 .hover-lift {
-  @apply transition-transform hover:-translate-y-0.5;
+  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-lg;
+}
+
+.facebook-hover {
+  @apply transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md cursor-pointer;
+}
+
+.facebook-icon-hover {
+  @apply transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 cursor-pointer;
+}
+
+/* Facebook-style navigation */
+.nav-item {
+  @apply flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300;
+}
+
+.nav-item.active {
+  @apply bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400;
+}
+
+/* Facebook-style shadows */
+.facebook-shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.facebook-shadow-lg {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12), 0 16px 32px rgba(0, 0, 0, 0.12);
 }
