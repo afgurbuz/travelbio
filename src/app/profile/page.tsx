@@ -401,112 +401,136 @@ export default function ProfilePage() {
       <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
           <div className="animate-fade-in">
-            {/* Profile Header - Facebook Style */}
+            {/* Profile Header - Minimalist Style */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
-              {/* Cover Photo Area */}
-              <div className="h-48 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg relative">
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-end space-x-4">
-                    {/* Profile Picture */}
-                    <div className="relative">
-                      <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
-                        <AvatarImage 
-                          src={profile?.avatar_url || undefined} 
-                          alt={profile?.username}
-                          className="object-cover"
-                        />
-                        <AvatarFallback className="bg-blue-600 text-white text-3xl font-bold">
-                          {profile?.username?.charAt(0).toUpperCase() || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <button className="absolute bottom-2 right-2 w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
-                        <Camera className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                      </button>
-                    </div>
-                    
-                    {/* Profile Info */}
-                    <div className="flex-1 pb-4">
-                      <h1 className="text-3xl font-bold text-white mb-1">
-                        {profile?.full_name || profile?.username || 'Your Profile'}
-                      </h1>
+              <div className="p-8">
+                <div className="flex flex-col items-center text-center">
+                  {/* Profile Picture */}
+                  <div className="relative mb-6">
+                    <Avatar className="w-28 h-28 shadow-lg">
+                      <AvatarImage 
+                        src={profile?.avatar_url || undefined} 
+                        alt={profile?.username}
+                        className="object-cover"
+                      />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white text-3xl font-bold">
+                        {profile?.username?.charAt(0).toUpperCase() || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-colors">
+                      <Camera className="w-4 h-4 text-white" />
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
                   
-                      {profile?.full_name && (
-                        <p className="text-blue-100 mb-1">
-                          @{profile?.username}
-                        </p>
-                      )}
-                      
-                      <div className="flex items-center space-x-4 text-blue-100 text-sm">
-                        <span className="flex items-center gap-1">
+                  {/* Profile Info */}
+                  <div className="mb-6">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                      {profile?.full_name || profile?.username || 'Your Profile'}
+                    </h1>
+                
+                    {profile?.full_name && (
+                      <p className="text-gray-500 dark:text-gray-400 mb-3">
+                        @{profile?.username}
+                      </p>
+                    )}
+                    
+                    {profile?.bio && (
+                      <p className="text-gray-700 dark:text-gray-300 mb-4 max-w-md">
+                        {profile.bio}
+                      </p>
+                    )}
+                    
+                    {/* Travel Stats */}
+                    <div className="flex items-center justify-center space-x-8 text-gray-600 dark:text-gray-400">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {userLocations.filter((l, i, arr) => arr.findIndex(x => x.country_id === l.country_id) === i).length}
+                        </div>
+                        <div className="text-sm flex items-center gap-1">
                           <Globe2 className="w-4 h-4" />
-                          {userLocations.filter((l, i, arr) => arr.findIndex(x => x.country_id === l.country_id) === i).length} countries
-                        </span>
-                        <span className="flex items-center gap-1">
+                          Countries
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {userLocations.length}
+                        </div>
+                        <div className="text-sm flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
-                          {userLocations.length} places
-                        </span>
+                          Places
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {userLocations.filter(l => l.overall_rating).length}
+                        </div>
+                        <div className="text-sm flex items-center gap-1">
+                          <Star className="w-4 h-4" />
+                          Reviews
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              
-              {/* Profile Info and Actions */}
-              <div className="p-6">
-                {profile?.bio && (
-                  <p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
-                    {profile.bio}
-                  </p>
-                )}
-                
-                <div className="flex justify-center space-x-3">
-                  <button
-                    onClick={() => setShowEditProfile(true)}
-                    className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Edit Profile
-                  </button>
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    Share
-                  </button>
-                  {profile?.username && (
-                    <a
-                      href={`/${profile.username}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-6 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                      onClick={() => setShowEditProfile(true)}
+                      className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" />
-                      View Public
-                    </a>
-                  )}
+                      <Edit3 className="w-4 h-4" />
+                      Edit Profile
+                    </button>
+                    <button
+                      onClick={handleShare}
+                      className="flex items-center gap-2 px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </button>
+                    {profile?.username && (
+                      <a
+                        href={`/${profile.username}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Public
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Edit Profile Modal */}
+            {/* Edit Profile Modal - Facebook Style */}
             {showEditProfile && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="card w-full max-w-md">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Edit Profile</h2>
-                    <button
-                      onClick={() => setShowEditProfile(false)}
-                      className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg transition-colors"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md">
+                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
+                      <button
+                        onClick={() => setShowEditProfile(false)}
+                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
-
-                  <div className="space-y-6">
+                  
+                  <div className="p-6 space-y-6">
                     {/* Avatar Upload */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                         Profile Photo
                       </label>
                       
@@ -516,10 +540,10 @@ export default function ProfilePage() {
                             <img 
                               src={editAvatarUrl} 
                               alt="Avatar preview"
-                              className="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
+                              className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                             />
                           ) : (
-                            <div className="w-16 h-16 bg-slate-900 dark:bg-slate-100 rounded-xl flex items-center justify-center text-white dark:text-slate-900 text-xl font-bold">
+                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
                               {editFullName?.charAt(0) || profile?.username?.charAt(0) || '?'}
                             </div>
                           )}
@@ -540,12 +564,12 @@ export default function ProfilePage() {
                           />
                           <label
                             htmlFor="avatar-upload"
-                            className="btn-secondary cursor-pointer"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition-colors cursor-pointer"
                           >
-                            <Upload className="w-4 h-4 mr-2" />
+                            <Upload className="w-4 h-4" />
                             {uploading ? 'Uploading...' : 'Upload Photo'}
                           </label>
-                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             JPG, PNG or GIF (max 1MB)
                           </p>
                         </div>
@@ -553,10 +577,10 @@ export default function ProfilePage() {
 
                       <div className="relative mb-4">
                         <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-slate-200 dark:border-slate-700" />
+                          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                          <span className="px-2 bg-white dark:bg-slate-900 text-slate-500">or use URL</span>
+                          <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">or use URL</span>
                         </div>
                       </div>
                       
@@ -568,21 +592,21 @@ export default function ProfilePage() {
                           setEditAvatarUrl(e.target.value)
                         }}
                         disabled={!!avatarFile}
-                        className="input"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="https://example.com/your-photo.jpg"
                       />
                     </div>
 
                     {/* Full Name */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Full Name
                       </label>
                       <input
                         type="text"
                         value={editFullName}
                         onChange={(e) => setEditFullName(e.target.value)}
-                        className="input"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Your full name"
                         maxLength={100}
                       />
@@ -590,44 +614,47 @@ export default function ProfilePage() {
 
                     {/* Bio */}
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Bio
                       </label>
                       <textarea
                         value={editBio}
                         onChange={(e) => setEditBio(e.target.value)}
                         rows={3}
-                        className="input resize-none"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
                         placeholder="Tell others about your travel passion..."
                         maxLength={500}
                       />
-                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {editBio.length}/500 characters
                       </p>
                     </div>
 
-                    {/* Buttons */}
-                    <div className="flex space-x-3 pt-4">
+                  </div>
+                  
+                  {/* Footer Buttons */}
+                  <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 rounded-b-lg">
+                    <div className="flex space-x-3">
                       <button
                         onClick={() => setShowEditProfile(false)}
-                        className="btn-secondary flex-1"
+                        className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 font-medium transition-colors"
                       >
                         Cancel
                       </button>
                       <button
                         onClick={handleUpdateProfile}
                         disabled={saving}
-                        className="btn-primary flex-1"
+                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors flex items-center justify-center"
                       >
                         {saving ? (
-                          <span className="flex items-center justify-center">
+                          <span className="flex items-center">
                             <div className="spinner mr-2"></div>
                             Saving...
                           </span>
                         ) : (
-                          <span className="flex items-center justify-center">
+                          <span className="flex items-center">
                             <Save className="w-4 h-4 mr-2" />
-                            Save
+                            Save Changes
                           </span>
                         )}
                       </button>
@@ -647,7 +674,7 @@ export default function ProfilePage() {
                   </h2>
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className="btn-facebook"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Add Experience
@@ -699,7 +726,7 @@ export default function ProfilePage() {
                     </p>
                     <button
                       onClick={() => setShowAddModal(true)}
-                      className="btn-facebook"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Add Your First Experience
@@ -727,37 +754,37 @@ export default function ProfilePage() {
                         : 0
                       
                       return (
-                        <Card 
+                        <div 
                           key={countryKey}
-                          className="cursor-pointer transition-all hover:shadow-md hover:scale-105 group"
+                          className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 cursor-pointer transition-all hover:shadow-md hover:scale-105 group"
                           onClick={() => {
                             setSelectedCountryData({country, locations})
                             setShowCountryModal(true)
                           }}
                         >
-                          <CardContent className="p-4 text-center relative">
+                          <div className="p-4 text-center relative">
                             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <div className="text-xs text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                              <div className="text-xs text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
                                 Detayları gör
                               </div>
                             </div>
                             <div className="text-3xl mb-2">{country.flag}</div>
-                            <div className="font-bold text-slate-900 dark:text-white mb-2">
+                            <div className="font-bold text-gray-900 dark:text-white mb-2">
                               {country.name}
                             </div>
-                            <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                               {locations.length} {locations.length === 1 ? 'trip' : 'trips'}
                             </div>
                             {avgRating > 0 && (
                               <div className="flex items-center justify-center gap-1">
                                 <StarRating value={avgRating} readonly size="sm" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
                                   {avgRating.toFixed(1)}
                                 </span>
                               </div>
                             )}
-                          </CardContent>
-                        </Card>
+                          </div>
+                        </div>
                       )
                     })}
                   </div>
@@ -765,27 +792,31 @@ export default function ProfilePage() {
                   /* Timeline Tab */
                   <div className="space-y-4">
                     {userLocations.map(location => (
-                      <Card key={location.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
+                      <div key={location.id} className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow">
+                        <div className="p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-3">
                               <span className="text-2xl">{location.country.flag}</span>
                               <div>
-                                <div className="font-medium text-slate-900 dark:text-white">
+                                <div className="font-medium text-gray-900 dark:text-white">
                                   {location.city ? location.city.name + ', ' : ''}
                                   <Link 
                                     href={`/country/${location.country.code.toLowerCase()}`}
-                                    className="hover:underline hover:text-slate-600 dark:hover:text-slate-300"
+                                    className="hover:underline hover:text-blue-600 dark:hover:text-blue-400"
                                   >
                                     {location.country.name}
                                   </Link>
                                 </div>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant={location.type === 'lived' ? 'default' : 'secondary'} className="text-xs">
+                                  <span className={`text-xs px-2 py-1 rounded-full ${
+                                    location.type === 'lived' 
+                                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                      : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                                  }`}>
                                     {location.type === 'lived' ? '🏠 Lived' : '✈️ Visited'}
-                                  </Badge>
+                                  </span>
                                   {location.visit_date && (
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
                                       {new Date(location.visit_date).toLocaleDateString()}
                                     </span>
                                   )}
@@ -794,41 +825,39 @@ export default function ProfilePage() {
                                   )}
                                 </div>
                                 {location.comment && (
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 italic mt-2">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 italic mt-2">
                                     "{location.comment}"
                                   </p>
                                 )}
                               </div>
                             </div>
-                            <Button
+                            <button
                               onClick={() => handleRemoveLocation(location.id)}
-                              variant="ghost"
-                              size="sm"
-                              className="text-slate-400 hover:text-red-500"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
                             >
                               <X className="w-4 h-4" />
-                            </Button>
+                            </button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Country Details Modal */}
+            {/* Country Details Modal - Facebook Style */}
             {showCountryModal && selectedCountryData && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <div className="bg-white dark:bg-slate-900 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-                  <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                  <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{selectedCountryData.country.flag}</span>
                       <div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                           {selectedCountryData.country.name}
                         </h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           {selectedCountryData.locations.length} {selectedCountryData.locations.length === 1 ? 'trip' : 'trips'}
                         </p>
                       </div>
@@ -836,42 +865,42 @@ export default function ProfilePage() {
                     <div className="flex items-center gap-2">
                       <Link 
                         href={`/country/${selectedCountryData.country.code.toLowerCase()}`}
-                        className="btn-secondary text-sm"
+                        className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 font-medium transition-colors text-sm"
                         onClick={() => setShowCountryModal(false)}
                       >
-                        <ExternalLink className="w-4 h-4 mr-1" />
+                        <ExternalLink className="w-4 h-4" />
                         Ülke Sayfası
                       </Link>
-                      <Button
+                      <button
                         onClick={() => setShowCountryModal(false)}
-                        variant="ghost"
-                        size="sm"
+                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       >
                         <X className="w-4 h-4" />
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   <div className="p-6 space-y-4">
                     {selectedCountryData.locations.map(location => (
-                      <Card key={location.id} className="bg-slate-50 dark:bg-slate-800 border-0">
-                        <CardContent className="p-4">
+                      <div key={location.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <div className="p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex items-start gap-3 flex-1">
-                              <Badge 
-                                variant={location.type === 'lived' ? 'default' : 'secondary'}
-                                className="text-xs shrink-0 mt-1"
-                              >
+                              <span className={`text-xs px-3 py-1 rounded-full shrink-0 mt-1 ${
+                                location.type === 'lived' 
+                                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                  : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                              }`}>
                                 {location.type === 'lived' ? '🏠 Yaşadım' : '✈️ Ziyaret'}
-                              </Badge>
+                              </span>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                   {location.city && (
-                                    <span className="font-medium text-slate-900 dark:text-white">
+                                    <span className="font-medium text-gray-900 dark:text-white">
                                       {location.city.name}
                                     </span>
                                   )}
                                   {location.visit_date && (
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
                                       {new Date(location.visit_date).toLocaleDateString('tr-TR')}
                                     </span>
                                   )}
@@ -882,13 +911,13 @@ export default function ProfilePage() {
                                   </div>
                                 )}
                                 {location.comment && (
-                                  <p className="text-sm text-slate-600 dark:text-slate-400 italic">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                                     "{location.comment}"
                                   </p>
                                 )}
                               </div>
                             </div>
-                            <Button
+                            <button
                               onClick={() => {
                                 handleRemoveLocation(location.id)
                                 // Refresh selected country data
@@ -899,31 +928,29 @@ export default function ProfilePage() {
                                   setSelectedCountryData({...selectedCountryData, locations: updatedLocations})
                                 }
                               }}
-                              variant="ghost"
-                              size="sm"
-                              className="text-slate-400 hover:text-red-500"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
                             >
                               <X className="w-4 h-4" />
-                            </Button>
+                            </button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Add Location Modal */}
+            {/* Add Location Modal - Facebook Style */}
             {showAddModal && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <CardHeader>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between">
-                      <CardTitle>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                         {modalStep === 'location' ? 'Add New Location' : 'Rate Your Experience'}
-                      </CardTitle>
-                      <Button
+                      </h2>
+                      <button
                         onClick={() => {
                           setShowAddModal(false)
                           setModalStep('location')
@@ -931,32 +958,31 @@ export default function ProfilePage() {
                           setSelectedCity('')
                           setVisitDate('')
                         }}
-                        variant="ghost"
-                        size="sm"
+                        className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       >
                         <X className="w-4 h-4" />
-                      </Button>
+                      </button>
                     </div>
                     {modalStep === 'rating' && (
-                      <p className="text-slate-600 dark:text-slate-400">
+                      <p className="text-gray-600 dark:text-gray-400 mt-2">
                         {countries.find(c => c.id === parseInt(selectedCountry))?.flag} {countries.find(c => c.id === parseInt(selectedCountry))?.name}
                         {selectedCity && (
                           <span> - {cities.find(c => c.id === parseInt(selectedCity))?.name}</span>
                         )}
                       </p>
                     )}
-                  </CardHeader>
+                  </div>
                   
-                  <CardContent className="space-y-6">
+                  <div className="p-6 space-y-6">
                     {modalStep === 'location' ? (
                       // Location Selection Step
                       <div className="space-y-6">
                         <div>
-                          <Label className="text-base font-medium mb-3 block">Type</Label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Type</label>
                           <select
                             value={locationType}
                             onChange={(e) => setLocationType(e.target.value as 'lived' | 'visited')}
-                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                            className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                             <option value="visited">✈️ Visited</option>
                             <option value="lived">🏠 Lived</option>
@@ -964,11 +990,11 @@ export default function ProfilePage() {
                         </div>
                         
                         <div>
-                          <Label className="text-base font-medium mb-3 block">Country</Label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Country</label>
                           <select
                             value={selectedCountry}
                             onChange={(e) => setSelectedCountry(e.target.value)}
-                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                            className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                             <option value="">Select country</option>
                             {countries.map(country => (
@@ -980,12 +1006,12 @@ export default function ProfilePage() {
                         </div>
                         
                         <div>
-                          <Label className="text-base font-medium mb-3 block">City (Optional)</Label>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">City (Optional)</label>
                           <select
                             value={selectedCity}
                             onChange={(e) => setSelectedCity(e.target.value)}
                             disabled={!selectedCountry}
-                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white disabled:opacity-50"
+                            className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                           >
                             <option value="">Select city</option>
                             {cities.map(city => (
@@ -997,44 +1023,22 @@ export default function ProfilePage() {
                         </div>
                         
                         <div>
-                          <Label className="text-base font-medium mb-3 block">Visit Date (Optional)</Label>
-                          <Input
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Visit Date (Optional)</label>
+                          <input
                             type="date"
                             value={visitDate}
                             onChange={(e) => setVisitDate(e.target.value)}
-                            className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+                            className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
                         
-                        <div className="flex gap-3 pt-4">
-                          <Button
-                            onClick={() => {
-                              setShowAddModal(false)
-                              setModalStep('location')
-                              setSelectedCountry('')
-                              setSelectedCity('')
-                              setVisitDate('')
-                            }}
-                            variant="secondary"
-                            className="flex-1"
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleProceedToRating}
-                            disabled={!selectedCountry}
-                            className="flex-1"
-                          >
-                            Continue to Rating
-                          </Button>
-                        </div>
                       </div>
                     ) : (
                       // Rating Step
-                      <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Transportation</Label>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Transportation</label>
                         <StarRating
                           value={ratings.transportation}
                           onChange={(value) => setRatings(prev => ({...prev, transportation: value}))}
@@ -1042,8 +1046,8 @@ export default function ProfilePage() {
                         />
                       </div>
                       
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Accommodation</Label>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Accommodation</label>
                         <StarRating
                           value={ratings.accommodation}
                           onChange={(value) => setRatings(prev => ({...prev, accommodation: value}))}
@@ -1051,8 +1055,8 @@ export default function ProfilePage() {
                         />
                       </div>
                       
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Food & Dining</Label>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Food & Dining</label>
                         <StarRating
                           value={ratings.food}
                           onChange={(value) => setRatings(prev => ({...prev, food: value}))}
@@ -1060,8 +1064,8 @@ export default function ProfilePage() {
                         />
                       </div>
                       
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Safety</Label>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Safety</label>
                         <StarRating
                           value={ratings.safety}
                           onChange={(value) => setRatings(prev => ({...prev, safety: value}))}
@@ -1069,8 +1073,8 @@ export default function ProfilePage() {
                         />
                       </div>
                       
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Activities & Attractions</Label>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Activities & Attractions</label>
                         <StarRating
                           value={ratings.activities}
                           onChange={(value) => setRatings(prev => ({...prev, activities: value}))}
@@ -1078,64 +1082,98 @@ export default function ProfilePage() {
                         />
                       </div>
                       
-                      <div>
-                        <Label className="text-base font-medium mb-3 block">Value for Money</Label>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Value for Money</label>
                         <StarRating
                           value={ratings.value}
                           onChange={(value) => setRatings(prev => ({...prev, value: value}))}
                           size="lg"
                         />
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div>
-                      <Label className="text-base font-medium mb-3 block">Overall Rating</Label>
+                          </div>
+                        </div>
+                        
+                        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Overall Rating</label>
                       <StarRating
                         value={ratings.overall}
                         onChange={(value) => setRatings(prev => ({...prev, overall: value}))}
                         size="lg"
                       />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="comment" className="text-base font-medium mb-3 block">
-                        Your Experience (Optional)
-                      </Label>
-                      <Textarea
-                        id="comment"
-                        value={ratings.comment}
-                        onChange={(e) => setRatings(prev => ({...prev, comment: e.target.value}))}
-                        placeholder="Share your thoughts about this destination..."
-                        rows={4}
-                        maxLength={500}
-                      />
-                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        {ratings.comment.length}/500 characters
-                      </p>
-                    </div>
-                    
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          onClick={() => setModalStep('location')}
-                          variant="secondary"
-                          className="flex-1"
-                        >
-                          Back
-                        </Button>
-                        <Button
-                          onClick={handleAddLocation}
-                          disabled={saving}
-                          className="flex-1"
-                        >
-                          {saving ? 'Adding Location...' : 'Add Location'}
-                        </Button>
+                        </div>
+                        
+                        <div>
+                          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            Your Experience (Optional)
+                          </label>
+                          <textarea
+                            id="comment"
+                            value={ratings.comment}
+                            onChange={(e) => setRatings(prev => ({...prev, comment: e.target.value}))}
+                            placeholder="Share your thoughts about this destination..."
+                            rows={4}
+                            maxLength={500}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                          />
+                          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            {ratings.comment.length}/500 characters
+                          </p>
+                        </div>
                       </div>
-                      </>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                  
+                  {/* Footer Buttons */}
+                  <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 rounded-b-lg">
+                    <div className="flex gap-3">
+                      {modalStep === 'location' ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              setShowAddModal(false)
+                              setModalStep('location')
+                              setSelectedCountry('')
+                              setSelectedCity('')
+                              setVisitDate('')
+                            }}
+                            className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={handleProceedToRating}
+                            disabled={!selectedCountry}
+                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors"
+                          >
+                            Continue to Rating
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setModalStep('location')}
+                            className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 font-medium transition-colors"
+                          >
+                            Back
+                          </button>
+                          <button
+                            onClick={handleAddLocation}
+                            disabled={saving}
+                            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-md font-medium transition-colors flex items-center justify-center"
+                          >
+                            {saving ? (
+                              <span className="flex items-center">
+                                <div className="spinner mr-2"></div>
+                                Adding...
+                              </span>
+                            ) : (
+                              'Add Location'
+                            )}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
