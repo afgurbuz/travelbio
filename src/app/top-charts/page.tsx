@@ -245,7 +245,7 @@ export default function TopChartsPage() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
             {/* Header */}
@@ -267,17 +267,17 @@ export default function TopChartsPage() {
               </p>
             </div>
 
-            {/* Top 10 Overall */}
-            <Card className="mb-12">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-2xl">
-                  <Trophy className="w-6 h-6 text-yellow-500" />
+            {/* Top 10 Overall - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
+                  <Trophy className="w-5 h-5 text-yellow-500" />
                   Top 10 Overall Destinations
-                </CardTitle>
-                <p className="text-slate-600 dark:text-slate-400">
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
                   Highest rated countries based on overall traveler experiences
                 </p>
-              </CardHeader>
+              </div>
               <CardContent>
                 {topCountries.length === 0 ? (
                   <div className="text-center py-12">

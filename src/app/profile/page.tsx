@@ -814,8 +814,8 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Country Details Modal */}
             {showCountryModal && selectedCountryData && (
