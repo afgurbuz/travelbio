@@ -5,19 +5,11 @@ import { notFound } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { MapPin, Globe, Users, Star, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import StarRating from '@/components/StarRating'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import Navigation from '@/components/Navigation'
+import { User } from '@supabase/supabase-js'
 
 interface Country {
   id: number
@@ -77,6 +69,7 @@ interface PageProps {
 }
 
 export default function CountryPage({ params }: PageProps) {
+  const [user, setUser] = useState<User | null>(null)
   const [country, setCountry] = useState<Country | null>(null)
   const [ratings, setRatings] = useState<CountryRating | null>(null)
   const [reviews, setReviews] = useState<UserReview[]>([])
@@ -92,7 +85,24 @@ export default function CountryPage({ params }: PageProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [cities, setCities] = useState<City[]>([])
   const [filterCity, setFilterCity] = useState<'all' | string>('all')
-  const reviewsPerPage = 10
+  const reviewsPerPage = 8 // Increased for better UX
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+
+    getUser()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event: any, session: any) => {
+        setUser(session?.user ?? null)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const loadCountryData = async () => {
@@ -230,9 +240,13 @@ export default function CountryPage({ params }: PageProps) {
   const startIndex = (currentPage - 1) * reviewsPerPage
   const paginatedReviews = filteredReviews.slice(startIndex, startIndex + reviewsPerPage)
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="spinner"></div>
       </div>
     )
@@ -240,15 +254,15 @@ export default function CountryPage({ params }: PageProps) {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Something went wrong
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-colors"
           >
             Try Again
           </button>
@@ -258,339 +272,320 @@ export default function CountryPage({ params }: PageProps) {
   }
 
   if (notFoundCountry || !country) {
-    notFound()
+    return notFound()
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <Button asChild variant="ghost">
-              <Link href="/discover">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Discover
-              </Link>
-            </Button>
-            <Link href="/discover" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                <Globe className="w-6 h-6 text-white dark:text-slate-900" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent">
-                TravelBio
-              </span>
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="animate-fade-in">
-          {/* Country Header */}
-          <Card className="mb-8">
-            <CardContent className="pt-8">
-              <div className="text-center">
+    <>
+      <Navigation user={user} onSignOut={handleSignOut} />
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
+          <div className="animate-fade-in">
+            {/* Country Header - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+              <div className="p-8 text-center">
                 <div className="text-8xl mb-6">{country.flag}</div>
-                <h1 className="text-5xl font-bold text-slate-900 dark:text-white mb-4">
+                <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
                   {country.name}
                 </h1>
                 
                 {country.description && (
-                  <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-6 leading-relaxed">
+                  <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-6 leading-relaxed">
                     {country.description}
                   </p>
                 )}
 
-                {/* Country Info */}
-                <div className="flex flex-wrap justify-center gap-6 mt-8">
+                {/* Country Info Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
                   {country.currency && (
                     <div className="text-center">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Currency</p>
-                      <p className="font-medium text-slate-900 dark:text-white">{country.currency}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Currency</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{country.currency}</p>
                     </div>
                   )}
                   {country.language && (
                     <div className="text-center">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Language</p>
-                      <p className="font-medium text-slate-900 dark:text-white">{country.language}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Language</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{country.language}</p>
                     </div>
                   )}
                   {country.best_time_to_visit && (
                     <div className="text-center">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Best Time to Visit</p>
-                      <p className="font-medium text-slate-900 dark:text-white">{country.best_time_to_visit}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Best Time</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{country.best_time_to_visit}</p>
                     </div>
                   )}
                   {ratings && (
                     <div className="text-center">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Travelers</p>
-                      <p className="font-medium text-slate-900 dark:text-white">{ratings.visitor_count} people</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Travelers</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{ratings.visitor_count} people</p>
                     </div>
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Ratings Overview */}
-          {ratings && ratings.avg_overall > 0 && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5 text-yellow-500" />
-                  Traveler Ratings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                      {ratings.avg_overall}
-                    </div>
-                    <StarRating value={ratings.avg_overall} readonly size="md" />
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">Overall</p>
-                  </div>
+            {/* Ratings Overview - Facebook Style */}
+            {ratings && ratings.avg_overall > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+                <div className="p-6">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-6">
+                    <Star className="w-5 h-5 text-yellow-500" />
+                    Traveler Ratings
+                  </h2>
                   
-                  {ratings.avg_transportation > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Transportation</p>
-                      <StarRating value={ratings.avg_transportation} readonly showValue />
+                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="text-center bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                        {ratings.avg_overall.toFixed(1)}
+                      </div>
+                      <StarRating value={ratings.avg_overall} readonly size="md" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 font-medium">Overall Rating</p>
                     </div>
-                  )}
-                  
-                  {ratings.avg_accommodation > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Accommodation</p>
-                      <StarRating value={ratings.avg_accommodation} readonly showValue />
-                    </div>
-                  )}
-                  
-                  {ratings.avg_food > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Food & Dining</p>
-                      <StarRating value={ratings.avg_food} readonly showValue />
-                    </div>
-                  )}
-                  
-                  {ratings.avg_safety > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Safety</p>
-                      <StarRating value={ratings.avg_safety} readonly showValue />
-                    </div>
-                  )}
-                  
-                  {ratings.avg_activities > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Activities</p>
-                      <StarRating value={ratings.avg_activities} readonly showValue />
-                    </div>
-                  )}
-                  
-                  {ratings.avg_value > 0 && (
-                    <div>
-                      <p className="font-medium text-slate-900 dark:text-white mb-2">Value for Money</p>
-                      <StarRating value={ratings.avg_value} readonly showValue />
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* User Reviews */}
-          {reviews.length > 0 && (
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col gap-4">
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Traveler Reviews ({filteredReviews.length} / {reviews.length})
-                  </CardTitle>
-                  
-                  {/* Filters */}
-                  <div className="flex flex-wrap gap-3">
-                    <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Filter type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tüm Tipler</SelectItem>
-                        <SelectItem value="lived">🏠 Yaşadım</SelectItem>
-                        <SelectItem value="visited">✈️ Ziyaret</SelectItem>
-                      </SelectContent>
-                    </Select>
                     
-                    <Select value={filterRating} onValueChange={(value: any) => setFilterRating(value)}>
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Filter rating" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Tüm Puanlar</SelectItem>
-                        <SelectItem value="5">⭐ 5 Yıldız</SelectItem>
-                        <SelectItem value="4">⭐ 4 Yıldız</SelectItem>
-                        <SelectItem value="3">⭐ 3 Yıldız</SelectItem>
-                        <SelectItem value="2">⭐ 2 Yıldız</SelectItem>
-                        <SelectItem value="1">⭐ 1 Yıldız</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    {cities.length > 0 && (
-                      <Select value={filterCity} onValueChange={setFilterCity}>
-                        <SelectTrigger className="w-[160px]">
-                          <SelectValue placeholder="Filter city" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Tüm Şehirler</SelectItem>
-                          {cities.map((city) => (
-                            <SelectItem key={city.id} value={city.id.toString()}>
-                              {city.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    {ratings.avg_transportation > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Transportation</p>
+                        <StarRating value={ratings.avg_transportation} readonly showValue />
+                      </div>
                     )}
                     
-                    <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                      <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Sort by" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="newest">En Yeni</SelectItem>
-                        <SelectItem value="oldest">En Eski</SelectItem>
-                        <SelectItem value="highest">En Yüksek Puan</SelectItem>
-                        <SelectItem value="lowest">En Düşük Puan</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {ratings.avg_accommodation > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Accommodation</p>
+                        <StarRating value={ratings.avg_accommodation} readonly showValue />
+                      </div>
+                    )}
+                    
+                    {ratings.avg_food > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Food & Dining</p>
+                        <StarRating value={ratings.avg_food} readonly showValue />
+                      </div>
+                    )}
+                    
+                    {ratings.avg_safety > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Safety</p>
+                        <StarRating value={ratings.avg_safety} readonly showValue />
+                      </div>
+                    )}
+                    
+                    {ratings.avg_activities > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Activities</p>
+                        <StarRating value={ratings.avg_activities} readonly showValue />
+                      </div>
+                    )}
+                    
+                    {ratings.avg_value > 0 && (
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <p className="font-medium text-gray-900 dark:text-white mb-2">Value for Money</p>
+                        <StarRating value={ratings.avg_value} readonly showValue />
+                      </div>
+                    )}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {paginatedReviews.map((review) => (
-                    <div key={review.id} className="border-b border-slate-200 dark:border-slate-700 last:border-0 pb-6 last:pb-0">
-                      <div className="flex items-start gap-4">
-                        <Avatar>
-                          <AvatarImage src={review.profile?.avatar_url || undefined} />
-                          <AvatarFallback>
-                            {review.profile?.username?.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-medium text-slate-900 dark:text-white">
-                              {review.profile?.full_name || review.profile?.username}
-                            </h4>
-                            <Badge variant={review.type === 'lived' ? 'default' : 'secondary'}>
-                              {review.type === 'lived' ? '🏠 Lived here' : '✈️ Visited'}
-                            </Badge>
-                            {review.city && (
-                              <span className="text-sm text-slate-500 dark:text-slate-400">
-                                in {review.city.name}
+              </div>
+            )}
+
+            {/* User Reviews - Facebook Style */}
+            {reviews.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <div className="p-6">
+                  <div className="flex flex-col gap-4 mb-6">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <Users className="w-5 h-5" />
+                      Traveler Reviews ({filteredReviews.length} / {reviews.length})
+                    </h2>
+                    
+                    {/* Filters - Facebook Style */}
+                    <div className="flex flex-wrap gap-3">
+                      <select
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value as any)}
+                        className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="all">All Types</option>
+                        <option value="lived">🏠 Lived</option>
+                        <option value="visited">✈️ Visited</option>
+                      </select>
+                      
+                      <select
+                        value={filterRating}
+                        onChange={(e) => setFilterRating(e.target.value as any)}
+                        className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="all">All Ratings</option>
+                        <option value="5">⭐ 5 Stars</option>
+                        <option value="4">⭐ 4 Stars</option>
+                        <option value="3">⭐ 3 Stars</option>
+                        <option value="2">⭐ 2 Stars</option>
+                        <option value="1">⭐ 1 Star</option>
+                      </select>
+                      
+                      {cities.length > 0 && (
+                        <select
+                          value={filterCity}
+                          onChange={(e) => setFilterCity(e.target.value)}
+                          className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="all">All Cities</option>
+                          {cities.map((city) => (
+                            <option key={city.id} value={city.id.toString()}>
+                              {city.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="px-4 py-2 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
+                        <option value="highest">Highest Rating</option>
+                        <option value="lowest">Lowest Rating</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {paginatedReviews.map((review) => (
+                      <div key={review.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div className="flex items-start gap-4">
+                          <Link href={`/${review.profile?.username}`}>
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={review.profile?.avatar_url || undefined} />
+                              <AvatarFallback className="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                                {review.profile?.username?.charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Link>
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <Link href={`/${review.profile?.username}`}>
+                                <h4 className="font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                  {review.profile?.full_name || review.profile?.username}
+                                </h4>
+                              </Link>
+                              <span className={`text-xs px-3 py-1 rounded-full ${
+                                review.type === 'lived' 
+                                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' 
+                                  : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                              }`}>
+                                {review.type === 'lived' ? '🏠 Lived here' : '✈️ Visited'}
                               </span>
+                              {review.city && (
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                  in {review.city.name}
+                                </span>
+                              )}
+                              {review.visit_date && (
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                  • {new Date(review.visit_date).toLocaleDateString()}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {review.overall_rating && (
+                              <div className="mb-3">
+                                <StarRating value={review.overall_rating} readonly showValue />
+                              </div>
                             )}
-                            {review.visit_date && (
-                              <span className="text-xs text-slate-500 dark:text-slate-400">
-                                • {new Date(review.visit_date).toLocaleDateString()}
-                              </span>
+                            
+                            {review.comment && (
+                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                                {review.comment}
+                              </p>
                             )}
                           </div>
-                          
-                          {review.overall_rating && (
-                            <div className="mb-3">
-                              <StarRating value={review.overall_rating} readonly showValue />
-                            </div>
-                          )}
-                          
-                          {review.comment && (
-                            <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                              {review.comment}
-                            </p>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
-                        if (
-                          page === 1 || 
-                          page === totalPages || 
-                          (page >= currentPage - 1 && page <= currentPage + 1)
-                        ) {
-                          return (
-                            <Button
-                              key={page}
-                              variant={currentPage === page ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setCurrentPage(page)}
-                              className="w-8 h-8 p-0"
-                            >
-                              {page}
-                            </Button>
-                          )
-                        } else if (
-                          page === currentPage - 2 || 
-                          page === currentPage + 2
-                        ) {
-                          return <span key={page} className="px-1">...</span>
-                        }
-                        return null
-                      })}
-                    </div>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
+                    ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* No Reviews State */}
-          {reviews.length === 0 && (
-            <Card className="text-center py-16">
-              <CardContent>
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-slate-400" />
+                  
+                  {/* Pagination - Facebook Style */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        className="p-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => {
+                          if (
+                            page === 1 || 
+                            page === totalPages || 
+                            (page >= currentPage - 2 && page <= currentPage + 2)
+                          ) {
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-10 h-10 rounded-md text-sm font-medium transition-colors ${
+                                  currentPage === page
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            )
+                          } else if (
+                            page === currentPage - 3 || 
+                            page === currentPage + 3
+                          ) {
+                            return <span key={page} className="px-2 text-gray-500">...</span>
+                          }
+                          return null
+                        })}
+                      </div>
+                      
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        className="p-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+              </div>
+            )}
+
+            {/* No Reviews State - Facebook Style */}
+            {reviews.length === 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-16 text-center">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MapPin className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                   No reviews yet
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-6">
-                  Be the first to share your experience about {country.name}!
+                <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
+                  Be the first to share your experience about {country.name}! Help other travelers discover this destination.
                 </p>
-                <Button asChild>
-                  <Link href="/profile">
-                    Add Your Experience
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+                <Link
+                  href="/profile"
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-md font-semibold transition-colors"
+                >
+                  <Star className="w-5 h-5" />
+                  Add Your Experience
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </main>
-    </div>
+    </>
   )
 }
