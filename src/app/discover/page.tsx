@@ -19,9 +19,6 @@ interface FeedItem {
     flag: string
     code: string
   }
-  city?: {
-    name: string
-  }
   created_at: string
   comment?: string
   overall_rating?: number
@@ -107,11 +104,22 @@ export default function FeedPage() {
       // Calculate offset for pagination
       const offset = (currentPage - 1) * itemsPerPage
 
+      // First test simple query
+      const { data: testData, error: testError } = await supabase
+        .from('user_locations')
+        .select('id, created_at')
+        .limit(5)
+
+      console.log('Test query result:', testData?.length || 0, 'items')
+      if (testError) console.error('Test query error:', testError)
+
       // Get total count for pagination
       const { count } = await supabase
         .from('user_locations')
         .select('*', { count: 'exact', head: true })
 
+      console.log('Total user_locations count:', count)
+      
       if (count) {
         setTotalPages(Math.ceil(count / itemsPerPage))
       }
@@ -133,13 +141,17 @@ export default function FeedPage() {
           value_rating,
           visit_date,
           country:countries(id, name, flag, code),
-          city:cities(name),
           profile:profiles(username, full_name, avatar_url)
         `)
         .order('created_at', { ascending: false })
         .range(offset, offset + itemsPerPage - 1)
 
-      if (error) throw error
+      if (error) {
+        console.error('Feed query error:', error)
+        throw error
+      }
+
+      console.log('Feed data received:', feedData?.length || 0, 'items')
 
       if (feedData) {
         const items: FeedItem[] = feedData
@@ -149,7 +161,6 @@ export default function FeedPage() {
             user_id: item.user_id,
             type: item.overall_rating ? 'new_review' : 'new_location',
             country: item.country,
-            city: item.city,
             created_at: item.created_at,
             comment: item.comment,
             overall_rating: item.overall_rating,
@@ -432,11 +443,6 @@ export default function FeedPage() {
                                   >
                                     {item.country.flag} {item.country.name}
                                   </Link>
-                                  {item.city && (
-                                    <span className="text-gray-500 dark:text-gray-400 ml-1">
-                                      • {item.city.name}
-                                    </span>
-                                  )}
                                 </div>
                                 
                                 <div className="flex items-center gap-1 text-xs text-gray-400">
