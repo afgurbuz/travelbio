@@ -7,7 +7,7 @@ import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
 import { Trophy, Star, Users, MapPin, TrendingUp, Medal, Award, Car, Home, Utensils, Shield, Gamepad2, DollarSign } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import StarRating from '@/components/StarRating'
@@ -278,7 +278,7 @@ export default function TopChartsPage() {
                   Highest rated countries based on overall traveler experiences
                 </p>
               </div>
-              <CardContent>
+              <div className="p-6">
                 {topCountries.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -289,43 +289,41 @@ export default function TopChartsPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid gap-4">
+                  <div className="space-y-4">
                     {topCountries.map((country, index) => (
-                      <Card key={country.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="p-4">
-                          <Link 
-                            href={`/country/${country.code.toLowerCase()}`}
-                            className="flex items-center gap-4 group"
-                          >
-                            <div className="flex items-center gap-3">
-                              {getRankMedal(index + 1)}
-                              <span className="text-3xl">{country.flag}</span>
+                      <Link 
+                        key={country.id}
+                        href={`/country/${country.code.toLowerCase()}`}
+                        className="block p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
+                            {getRankMedal(index + 1)}
+                            <span className="text-3xl">{country.flag}</span>
+                          </div>
+                          
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                              {country.name}
+                            </h3>
+                            <div className="flex items-center gap-3 mt-1">
+                              <StarRating value={country.avg_overall} readonly showValue />
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {country.visitor_count} travelers
+                              </span>
                             </div>
-                            
-                            <div className="flex-1">
-                              <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                                {country.name}
-                              </h3>
-                              <div className="flex items-center gap-3 mt-1">
-                                <StarRating value={country.avg_overall} readonly showValue />
-                                <Badge variant="secondary" className="flex items-center gap-1">
-                                  <Users className="w-3 h-3" />
-                                  {country.visitor_count} travelers
-                                </Badge>
-                              </div>
+                          </div>
+                          
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                              {country.avg_overall.toFixed(1)}
                             </div>
-                            
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {country.avg_overall.toFixed(1)}
-                              </div>
-                              <div className="text-sm text-slate-500 dark:text-slate-400">
-                                overall
-                              </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              overall
                             </div>
-                          </Link>
-                        </CardContent>
-                      </Card>
+                          </div>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                 )}
@@ -371,17 +369,17 @@ export default function TopChartsPage() {
             {/* Category Rankings - Each category gets its own section */}
             <div className="space-y-12">
               {categoryRankings.map((category) => (
-                <Card key={category.category} className="overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-b">
-                    <CardTitle className="flex items-center gap-3 text-2xl">
+                <div key={category.category} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-2">
                       {category.icon}
                       {category.title}
-                    </CardTitle>
-                    <p className="text-slate-600 dark:text-slate-400">
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400">
                       Top {category.countries.length} destinations ranked by traveler ratings
                     </p>
-                  </CardHeader>
-                  <CardContent className="p-6">
+                  </div>
+                  <div className="p-6">
                     {category.countries.length === 0 ? (
                       <div className="text-center py-16">
                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -410,8 +408,8 @@ export default function TopChartsPage() {
                               href={`/country/${country.code.toLowerCase()}`}
                               className="group"
                             >
-                              <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
-                                <CardContent className="p-4">
+                              <div className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md bg-white dark:bg-gray-800 rounded-lg">
+                                <div className="p-4">
                                   <div className="flex items-center gap-4">
                                     <div className="flex items-center gap-3">
                                       {getRankMedal(index + 1)}
@@ -445,22 +443,22 @@ export default function TopChartsPage() {
                                       </div>
                                     </div>
                                   </div>
-                                </CardContent>
-                              </Card>
+                                </div>
+                              </div>
                             </Link>
                           )
                         })}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
 
             {/* CTA */}
             {!user && (
-              <Card className="mt-16 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-0">
-                <CardContent className="text-center py-12">
+              <div className="mt-16 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-0 rounded-lg shadow-sm">
+                <div className="text-center py-12 p-6">
                   <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
                     Help shape these rankings
                   </h3>
@@ -474,8 +472,8 @@ export default function TopChartsPage() {
                     <Trophy className="w-5 h-5 mr-2" />
                     Join TravelBio
                   </Link>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </div>
         </div>
