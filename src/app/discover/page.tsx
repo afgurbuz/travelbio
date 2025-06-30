@@ -124,57 +124,83 @@ export default function FeedPage() {
         setTotalPages(Math.ceil(count / itemsPerPage))
       }
 
-      // Get feed items with profiles and location data
-      const { data: feedData, error } = await supabase
+      // Get feed items first
+      const { data: locationsData, error: locError } = await supabase
         .from('user_locations')
-        .select(`
-          id,
-          user_id,
-          created_at,
-          comment,
-          overall_rating,
-          transportation_rating,
-          accommodation_rating,
-          food_rating,
-          safety_rating,
-          activities_rating,
-          value_rating,
-          visit_date,
-          country:countries(id, name, flag, code),
-          profile:profiles(username, full_name, avatar_url)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .range(offset, offset + itemsPerPage - 1)
 
-      if (error) {
-        console.error('Feed query error:', error)
-        throw error
+      if (locError) {
+        console.error('Locations query error:', locError)
+        throw locError
       }
 
-      console.log('Feed data received:', feedData?.length || 0, 'items')
+      console.log('Locations data received:', locationsData?.length || 0, 'items')
 
-      if (feedData) {
-        const items: FeedItem[] = feedData
-          .filter((item: any) => item.country && item.profile)
-          .map((item: any) => ({
-            id: item.id,
-            user_id: item.user_id,
-            type: item.overall_rating ? 'new_review' : 'new_location',
-            country: item.country,
-            created_at: item.created_at,
-            comment: item.comment,
-            overall_rating: item.overall_rating,
-            transportation_rating: item.transportation_rating,
-            accommodation_rating: item.accommodation_rating,
-            food_rating: item.food_rating,
-            safety_rating: item.safety_rating,
-            activities_rating: item.activities_rating,
-            value_rating: item.value_rating,
-            visit_date: item.visit_date,
-            profile: item.profile
-          }))
+      if (locationsData && locationsData.length > 0) {
+        // Get unique user IDs and country IDs
+        const userIds = [...new Set(locationsData.map(l => l.user_id))]
+        const countryIds = [...new Set(locationsData.map(l => l.country_id))]
+        
+        console.log('Fetching profiles for users:', userIds.length)
+        console.log('Fetching countries for IDs:', countryIds.length)
 
+        // Fetch profiles
+        const { data: profilesData, error: profError } = await supabase
+          .from('profiles')
+          .select('id, username, full_name, avatar_url')
+          .in('id', userIds)
+
+        if (profError) {
+          console.error('Profiles query error:', profError)
+        }
+
+        // Fetch countries
+        const { data: countriesData, error: countryError } = await supabase
+          .from('countries')
+          .select('id, name, flag, code')
+          .in('id', countryIds)
+
+        if (countryError) {
+          console.error('Countries query error:', countryError)
+        }
+
+        console.log('Profiles fetched:', profilesData?.length || 0)
+        console.log('Countries fetched:', countriesData?.length || 0)
+
+        // Map data
+        const items: FeedItem[] = locationsData
+          .map((location: any) => {
+            const profile = profilesData?.find(p => p.id === location.user_id)
+            const country = countriesData?.find(c => c.id === location.country_id)
+            
+            if (!profile || !country) return null
+            
+            return {
+              id: location.id,
+              user_id: location.user_id,
+              type: location.overall_rating ? 'new_review' : 'new_location',
+              country: country,
+              created_at: location.created_at,
+              comment: location.comment,
+              overall_rating: location.overall_rating,
+              transportation_rating: location.transportation_rating,
+              accommodation_rating: location.accommodation_rating,
+              food_rating: location.food_rating,
+              safety_rating: location.safety_rating,
+              activities_rating: location.activities_rating,
+              value_rating: location.value_rating,
+              visit_date: location.visit_date,
+              profile: profile
+            }
+          })
+          .filter(item => item !== null) as FeedItem[]
+
+        console.log('Final feed items:', items.length)
         setFeedItems(items)
+      } else {
+        setFeedItems([])
       }
     } catch (error) {
       console.error('Error loading feed items:', error)
