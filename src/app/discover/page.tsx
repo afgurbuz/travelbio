@@ -140,8 +140,8 @@ export default function FeedPage() {
 
       if (locationsData && locationsData.length > 0) {
         // Get unique user IDs and country IDs
-        const userIds = [...new Set(locationsData.map(l => l.user_id))]
-        const countryIds = [...new Set(locationsData.map(l => l.country_id))]
+        const userIds = Array.from(new Set(locationsData.map((l: any) => l.user_id)))
+        const countryIds = Array.from(new Set(locationsData.map((l: any) => l.country_id)))
         
         console.log('Fetching profiles for users:', userIds.length)
         console.log('Fetching countries for IDs:', countryIds.length)
