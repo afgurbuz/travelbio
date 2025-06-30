@@ -7,8 +7,8 @@ import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
 import { Search, MapPin, Users, Star, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import StarRating from '@/components/StarRating'
 
@@ -145,45 +145,52 @@ function SearchContent() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
           <div className="animate-fade-in">
-            {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                Arama Sonuçları
-              </h1>
-              {query && (
-                <p className="text-slate-600 dark:text-slate-400">
-                  "{query}" için sonuçlar
-                </p>
-              )}
+            {/* Header - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-white" />
+                </div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  Arama Sonuçları
+                </h1>
+                {query && (
+                  <p className="text-gray-600 dark:text-gray-400">
+                    "{query}" için sonuçlar
+                  </p>
+                )}
+              </div>
             </div>
 
             {loading ? (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-16 text-center">
+                <Loader2 className="w-8 h-8 animate-spin text-gray-400 mx-auto" />
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Users Results */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <Users className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                      Kullanıcılar
-                    </h2>
-                    <Badge variant="secondary">{userResults.length}</Badge>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                        Kullanıcılar
+                      </h2>
+                      <span className="ml-auto bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-400">
+                        {userResults.length}
+                      </span>
+                    </div>
                   </div>
 
                   {userResults.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center">
-                        <p className="text-slate-500 dark:text-slate-400">
-                          Kullanıcı bulunamadı
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Kullanıcı bulunamadı
+                      </p>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {userResults.map((userResult) => (
@@ -192,42 +199,40 @@ function SearchContent() {
                           href={`/${userResult.username}`}
                           className="block"
                         >
-                          <Card className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
-                                <Avatar className="w-12 h-12">
-                                  <AvatarImage 
-                                    src={userResult.avatar_url || undefined}
-                                    alt={userResult.username}
-                                  />
-                                  <AvatarFallback className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 text-white dark:text-slate-900">
-                                    {userResult.username.charAt(0).toUpperCase()}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                  <h3 className="font-bold text-slate-900 dark:text-white">
-                                    {userResult.full_name || userResult.username}
-                                  </h3>
-                                  {userResult.full_name && (
-                                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                                      @{userResult.username}
-                                    </p>
-                                  )}
-                                  {userResult.bio && (
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1 line-clamp-2">
-                                      {userResult.bio}
-                                    </p>
-                                  )}
-                                </div>
-                                {userResult.country_count !== undefined && userResult.country_count > 0 && (
-                                  <Badge variant="secondary" className="flex items-center gap-1">
-                                    <MapPin className="w-3 h-3" />
-                                    {userResult.country_count}
-                                  </Badge>
+                          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4">
+                            <div className="flex items-center gap-4">
+                              <Avatar className="w-12 h-12">
+                                <AvatarImage 
+                                  src={userResult.avatar_url || undefined}
+                                  alt={userResult.username}
+                                />
+                                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                                  {userResult.username.charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-gray-900 dark:text-white">
+                                  {userResult.full_name || userResult.username}
+                                </h3>
+                                {userResult.full_name && (
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    @{userResult.username}
+                                  </p>
+                                )}
+                                {userResult.bio && (
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                                    {userResult.bio}
+                                  </p>
                                 )}
                               </div>
-                            </CardContent>
-                          </Card>
+                              {userResult.country_count !== undefined && userResult.country_count > 0 && (
+                                <div className="bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
+                                  <MapPin className="w-3 h-3" />
+                                  {userResult.country_count}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </Link>
                       ))}
                     </div>
@@ -236,22 +241,24 @@ function SearchContent() {
 
                 {/* Countries Results */}
                 <div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <MapPin className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                      Ülkeler
-                    </h2>
-                    <Badge variant="secondary">{countryResults.length}</Badge>
+                  <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                        Ülkeler
+                      </h2>
+                      <span className="ml-auto bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm text-gray-600 dark:text-gray-400">
+                        {countryResults.length}
+                      </span>
+                    </div>
                   </div>
 
                   {countryResults.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-8 text-center">
-                        <p className="text-slate-500 dark:text-slate-400">
-                          Ülke bulunamadı
-                        </p>
-                      </CardContent>
-                    </Card>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                      <p className="text-gray-500 dark:text-gray-400">
+                        Ülke bulunamadı
+                      </p>
+                    </div>
                   ) : (
                     <div className="space-y-3">
                       {countryResults.map((country) => (
@@ -260,33 +267,31 @@ function SearchContent() {
                           href={`/country/${country.code.toLowerCase()}`}
                           className="block"
                         >
-                          <Card className="hover:shadow-md transition-shadow">
-                            <CardContent className="p-4">
-                              <div className="flex items-center gap-4">
-                                <span className="text-4xl">{country.flag}</span>
-                                <div className="flex-1">
-                                  <h3 className="font-bold text-slate-900 dark:text-white">
-                                    {country.name}
-                                  </h3>
-                                  <div className="flex items-center gap-3 mt-1">
-                                    {country.visitor_count !== undefined && country.visitor_count > 0 && (
-                                      <span className="text-sm text-slate-500 dark:text-slate-400">
-                                        {country.visitor_count} ziyaretçi
+                          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-4">
+                            <div className="flex items-center gap-4">
+                              <span className="text-4xl">{country.flag}</span>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-gray-900 dark:text-white">
+                                  {country.name}
+                                </h3>
+                                <div className="flex items-center gap-3 mt-1">
+                                  {country.visitor_count !== undefined && country.visitor_count > 0 && (
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                      {country.visitor_count} ziyaretçi
+                                    </span>
+                                  )}
+                                  {country.avg_rating !== undefined && country.avg_rating > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <StarRating value={country.avg_rating} readonly size="sm" />
+                                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {country.avg_rating}
                                       </span>
-                                    )}
-                                    {country.avg_rating !== undefined && country.avg_rating > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        <StarRating value={country.avg_rating} readonly size="sm" />
-                                        <span className="text-sm text-slate-500 dark:text-slate-400">
-                                          {country.avg_rating}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
                         </Link>
                       ))}
                     </div>
@@ -297,17 +302,15 @@ function SearchContent() {
 
             {/* No results for either */}
             {!loading && query && userResults.length === 0 && countryResults.length === 0 && (
-              <Card>
-                <CardContent className="py-16 text-center">
-                  <Search className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    Sonuç bulunamadı
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400">
-                    "{query}" için sonuç bulunamadı. Farklı kelimelerle aramayı deneyin.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-16 text-center">
+                <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  Sonuç bulunamadı
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400">
+                  "{query}" için sonuç bulunamadı. Farklı kelimelerle aramayı deneyin.
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -319,8 +322,8 @@ function SearchContent() {
 export default function SearchPage() {
   return (
     <Suspense fallback={
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+      <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-gray-900">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
       </div>
     }>
       <SearchContent />

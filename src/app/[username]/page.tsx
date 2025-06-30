@@ -7,8 +7,8 @@ import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
 import { MapPin, Globe, Share2, Calendar, ArrowLeft, Clock, Globe2, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -158,15 +158,18 @@ export default function PublicProfilePage({ params }: PageProps) {
   return (
     <>
       <Navigation user={currentUser} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
         <div className="animate-fade-in">
-          {/* Profile Header */}
-          <Card className="mb-8">
-            <CardContent className="pt-8">
-              <div className="text-center">
-                <div className="relative inline-block mb-6">
-                  <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+          {/* Profile Header - Facebook Style */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+            {/* Cover Photo Area */}
+            <div className="h-48 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-lg relative">
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="flex items-end space-x-4">
+                  {/* Profile Picture */}
+                  <div className="relative">
+                    <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
                     <AvatarImage 
                       src={profile.avatar_url || undefined} 
                       alt={profile.username}

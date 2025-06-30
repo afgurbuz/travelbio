@@ -5,9 +5,9 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Globe, Mail, Lock, User, ArrowLeft } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Button } from '@/components/ui/button'
+// import { Input } from '@/components/ui/input'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -61,19 +61,22 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
         <div className="w-full max-w-md">
-          <div className="card text-center">
-            <div className="w-16 h-16 bg-slate-900 dark:bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Globe className="w-8 h-8 text-white dark:text-slate-900" />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+            <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Globe className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
               Check your email
             </h2>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               We've sent a verification link to <strong>{email}</strong>
             </p>
-            <Link href="/auth/signin" className="btn-primary w-full">
+            <Link
+              href="/auth/signin"
+              className="inline-block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md transition-colors text-center"
+            >
               Continue to Sign In
             </Link>
           </div>
@@ -83,31 +86,26 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
       <div className="w-full max-w-md">
-        <Button
-          asChild
-          variant="ghost"
-          className="mb-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+        <Link
+          href="/discover"
+          className="inline-flex items-center mb-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
         >
-          <Link href="/discover">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to discover
-          </Link>
-        </Button>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to discover
+        </Link>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader className="text-center pb-2">
-            <div className="w-16 h-16 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Globe className="w-8 h-8 text-white dark:text-slate-900" />
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Globe className="w-8 h-8 text-white" />
             </div>
-            <CardTitle className="text-2xl">Create account</CardTitle>
-            <p className="text-slate-600 dark:text-slate-400">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create account</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
               Start documenting your travels
             </p>
-          </CardHeader>
-          
-          <CardContent>
+          </div>
 
             <form onSubmit={handleSignUp} className="space-y-6">
               {error && (
@@ -121,12 +119,12 @@ export default function SignUpPage() {
                   Username
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="pl-10"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     placeholder="johndoe"
                     required
                   />
@@ -138,12 +136,12 @@ export default function SignUpPage() {
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     placeholder="you@example.com"
                     required
                   />
@@ -155,12 +153,12 @@ export default function SignUpPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     placeholder="Enter password"
                     required
                     minLength={6}
@@ -171,21 +169,20 @@ export default function SignUpPage() {
                 </p>
               </div>
 
-              <Button
+              <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11"
-                size="lg"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-semibold rounded-md transition-colors flex items-center justify-center"
               >
                 {isLoading ? (
                   <span className="flex items-center">
                     <div className="spinner mr-2"></div>
                     Creating account...
-                </span>
-              ) : (
-                'Create Account'
+                  </span>
+                ) : (
+                  'Create Account'
                 )}
-              </Button>
+              </button>
             </form>
 
             <div className="mt-6 text-center">

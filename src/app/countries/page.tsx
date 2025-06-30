@@ -7,8 +7,8 @@ import Navigation from '@/components/Navigation'
 import { User } from '@supabase/supabase-js'
 import { Globe, Search, MapPin, Star, Users } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import StarRating from '@/components/StarRating'
 
@@ -139,173 +139,149 @@ export default function CountriesPage() {
   return (
     <>
       <Navigation user={user} onSignOut={handleSignOut} />
-      <main className="min-h-screen bg-white dark:bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20 md:pb-8">
+      <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8">
           <div className="animate-fade-in">
-            {/* Header */}
-            <div className="text-center mb-12">
-              <div className="relative mx-auto mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 rounded-3xl flex items-center justify-center mx-auto shadow-lg">
-                  <Globe className="w-10 h-10 text-white dark:text-slate-900" />
+            {/* Header - Facebook Style */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Globe className="w-8 h-8 text-white" />
+                </div>
+                
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                  Explore Countries
+                </h1>
+                
+                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+                  Discover destinations around the world with traveler ratings and experiences.
+                </p>
+                
+                {/* Search - Facebook Style */}
+                <div className="max-w-md mx-auto relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search countries..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-100 dark:bg-gray-700 border-0 rounded-full text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  />
                 </div>
               </div>
+            </div>
+
+            {/* Stats - Facebook Style */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {countries.length}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">Total Countries</p>
+              </div>
               
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-6">
-                Explore Countries
-              </h1>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {countries.filter(c => c.visitor_count > 0).length}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">Countries Visited</p>
+              </div>
               
-              <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-10 leading-relaxed">
-                Discover destinations around the world with traveler ratings and experiences. 
-                Find your next adventure destination.
-              </p>
-              
-              {/* Search */}
-              <div className="max-w-md mx-auto relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search countries..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 py-3 text-lg"
-                />
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 text-center">
+                <div className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {countries.reduce((sum, c) => sum + c.trip_count, 0)}
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">Total Trips</p>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                    {countries.length}
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400">Total Countries</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                    {countries.filter(c => c.visitor_count > 0).length}
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400">Countries Visited</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-                    {countries.reduce((sum, c) => sum + c.trip_count, 0)}
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400">Total Trips</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Countries Grid */}
+            {/* Countries Grid - Facebook Style */}
             {filteredCountries.length === 0 ? (
-              <Card className="max-w-md mx-auto p-8 text-center">
-                <CardContent className="pt-6">
-                  <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Search className="w-8 h-8 text-slate-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    No countries found
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    Try adjusting your search terms.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  No countries found
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Try adjusting your search terms.
+                </p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filteredCountries.map((country) => (
-                  <Card 
+                  <Link 
                     key={country.id}
-                    className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                    href={`/country/${country.code.toLowerCase()}`}
+                    className="block bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden"
                   >
-                    <Link href={`/country/${country.code.toLowerCase()}`}>
-                      <CardContent className="p-6">
-                        <div className="text-center space-y-4">
-                          {/* Flag */}
-                          <div className="text-6xl mb-4">{country.flag}</div>
-                          
-                          {/* Country Name */}
-                          <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">
-                            {country.name}
-                          </h3>
-                          
-                          {/* Stats */}
-                          <div className="space-y-3">
-                            {country.avg_overall > 0 && (
-                              <div className="flex items-center justify-center gap-2">
-                                <StarRating value={country.avg_overall} readonly size="sm" />
-                                <span className="text-sm text-slate-600 dark:text-slate-400">
-                                  {country.avg_overall.toFixed(1)}
-                                </span>
-                              </div>
-                            )}
-                            
-                            <div className="flex justify-center gap-3">
-                              {country.visitor_count > 0 && (
-                                <Badge variant="secondary" className="flex items-center gap-1">
-                                  <Users className="w-3 h-3" />
-                                  {country.visitor_count}
-                                </Badge>
-                              )}
-                              {country.trip_count > 0 && (
-                                <Badge variant="secondary" className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {country.trip_count}
-                                </Badge>
-                              )}
+                    <div className="p-6">
+                      <div className="text-center space-y-4">
+                        {/* Flag */}
+                        <div className="text-5xl mb-3">{country.flag}</div>
+                        
+                        {/* Country Name */}
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {country.name}
+                        </h3>
+                        
+                        {/* Stats */}
+                        <div className="space-y-2">
+                          {country.avg_overall > 0 && (
+                            <div className="flex items-center justify-center gap-2">
+                              <StarRating value={country.avg_overall} readonly size="sm" />
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {country.avg_overall.toFixed(1)}
+                              </span>
                             </div>
-                            
-                            {country.visitor_count === 0 && (
-                              <div className="text-sm text-slate-500 dark:text-slate-400">
-                                No reviews yet
-                              </div>
+                          )}
+                          
+                          <div className="flex justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                            {country.visitor_count > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {country.visitor_count}
+                              </span>
+                            )}
+                            {country.trip_count > 0 && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                {country.trip_count}
+                              </span>
                             )}
                           </div>
                           
-                          {/* Additional Info */}
-                          {(country.currency || country.language) && (
-                            <div className="text-xs text-slate-500 dark:text-slate-400 space-y-1">
-                              {country.currency && (
-                                <div>Currency: {country.currency}</div>
-                              )}
-                              {country.language && (
-                                <div>Language: {country.language}</div>
-                              )}
+                          {country.visitor_count === 0 && (
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              No reviews yet
                             </div>
                           )}
                         </div>
-                      </CardContent>
-                    </Link>
-                  </Card>
+                      </div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             )}
 
-            {/* CTA */}
+            {/* CTA - Facebook Style */}
             {!user && (
-              <Card className="mt-16 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-0">
-                <CardContent className="text-center py-12">
-                  <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-                    Share your travel experiences
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg max-w-md mx-auto">
-                    Join TravelBio to rate countries and help other travelers discover amazing destinations.
-                  </p>
-                  <Link 
-                    href="/auth/signup"
-                    className="inline-flex items-center px-8 py-3 text-lg font-medium text-white bg-slate-900 dark:bg-slate-100 dark:text-slate-900 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 transition-colors"
-                  >
-                    <Globe className="w-5 h-5 mr-2" />
-                    Join TravelBio
-                  </Link>
-                </CardContent>
-              </Card>
+              <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 text-center">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                  Share your travel experiences
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                  Join TravelBio to rate countries and help other travelers discover amazing destinations.
+                </p>
+                <Link 
+                  href="/auth/signup"
+                  className="btn-facebook"
+                >
+                  <Globe className="w-5 h-5" />
+                  Join TravelBio
+                </Link>
+              </div>
             )}
           </div>
         </div>
