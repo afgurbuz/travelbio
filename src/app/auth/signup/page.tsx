@@ -115,7 +115,7 @@ export default function SignUpPage() {
               )}
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Username
                 </label>
                 <div className="relative">
@@ -132,7 +132,7 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
                 </label>
                 <div className="relative">
@@ -149,7 +149,7 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Password
                 </label>
                 <div className="relative">
@@ -164,7 +164,7 @@ export default function SignUpPage() {
                     minLength={6}
                   />
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   At least 6 characters
                 </p>
               </div>
@@ -186,16 +186,15 @@ export default function SignUpPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-gray-600 dark:text-gray-400">
                 Already have an account?{' '}
-                <Link href="/auth/signin" className="text-slate-900 dark:text-slate-100 font-medium hover:underline">
+                <Link href="/auth/signin" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
                   Sign in
                 </Link>
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
-    </div>
   )
 }
