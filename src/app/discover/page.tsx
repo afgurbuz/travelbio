@@ -172,8 +172,8 @@ export default function FeedPage() {
         // Map data
         const items: FeedItem[] = locationsData
           .map((location: any) => {
-            const profile = profilesData?.find(p => p.id === location.user_id)
-            const country = countriesData?.find(c => c.id === location.country_id)
+            const profile = profilesData?.find((p: any) => p.id === location.user_id)
+            const country = countriesData?.find((c: any) => c.id === location.country_id)
             
             if (!profile || !country) return null
             
