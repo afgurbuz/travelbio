@@ -312,7 +312,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-      <script async defer src="https://produck-sb.vercel.app/api/banner/23fc019f-5555-4d6e-b3e4-0d3e77e13742"></script>
+      <script async defer src="https://produck-sb.vercel.app/api/banner/4d4fe9ab-113c-4127-b54f-71f5c2558ecd"></script>
     </div>
   )
 }
