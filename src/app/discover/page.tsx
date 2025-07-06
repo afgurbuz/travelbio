@@ -195,7 +195,7 @@ export default function FeedPage() {
               profile: profile
             }
           })
-          .filter(item => item !== null) as FeedItem[]
+          .filter((item: any) => item !== null) as FeedItem[]
 
         console.log('Final feed items:', items.length)
         setFeedItems(items)
