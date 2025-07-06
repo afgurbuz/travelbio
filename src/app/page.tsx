@@ -312,6 +312,7 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+      <script src="https://www.produck.co/api/banner/23fc019f-5555-4d6e-b3e4-0d3e77e13742"></script>
     </div>
   )
 }
