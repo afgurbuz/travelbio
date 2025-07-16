@@ -1,0 +1,35 @@
+{
+  "signUp": {
+    "main": {
+      "error": {
+        "phone": "",
+        "campaign": "Ender",
+        "password": {
+          "empty": "asdfasdf\n"
+        },
+        "reference": "",
+        "passwordAgain": {
+          "empty": "falan filan",
+          "wrong": "deneme\n"
+        }
+      },
+      "input": {
+        "email": "",
+        "phone": "",
+        "password": "",
+        "reference": "",
+        "passwordAgain": ""
+      },
+      "legal": {
+        "content1": "",
+        "content2": "",
+        "content3": "",
+        "content4": "",
+        "content5": ""
+      },
+      "title": "",
+      "description": "Ahmet"
+    }
+  },
+  "welcome": ""
+}
