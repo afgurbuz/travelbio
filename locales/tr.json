@@ -1,35 +1,3 @@
 {
-  "signUp": {
-    "main": {
-      "error": {
-        "phone": "Cep telefonu numaranızı ve e-posta adresinizi girmelisiniz",
-        "campaign": "Girdiğiniz kampanya kodu hatalı",
-        "password": {
-          "empty": "Parolanızı belirlemelisiniz"
-        },
-        "reference": "Girdiğiniz kod hatalı",
-        "passwordAgain": {
-          "empty": "Belirlediğiniz parolayı tekrar girmelisiniz",
-          "wrong": "Girdiğiniz parolalar aynı olmalı"
-        }
-      },
-      "input": {
-        "email": "E-posta adresiniz",
-        "phone": "Cep telefonu numaranız",
-        "password": "Parolanız",
-        "reference": "Kampanya kodu (isteğe bağlı)",
-        "passwordAgain": "Parolanızın tekrarı"
-      },
-      "legal": {
-        "content1": "<a href=\"https://paribu.zendesk.com/api/v2/help_center/articles/115001575125\">Kullanım Şartları ve Üyelik Sözleşmesi</a>’ni okudum, anladım ve onaylıyorum.",
-        "content2": "Kullanıcı hesabı oluşturanlara yönelik olarak hazırlanan <a href=\"https://paribu.zendesk.com/api/v2/help_center/tr/articles/360015372839\">Açık Rıza Metni</a>’ni okudum, bu kapsamda kişisel verilerimin işlenmesine rıza veriyorum.",
-        "content3": "Ürün ve hizmetlerle ilgili <a href=\"https://paribu.zendesk.com/api/v2/help_center/articles/8513177980954\">Ticari Elektronik İleti İzni Bilgilendirme Metni</a> kapsamında e-posta, telefon ve elektronik iletişim kanalları yoluyla ticari elektronik iletiler almayı kabul ediyorum.",
-        "content4": "Kullanıcı hesabı oluşturulması kapsamında kişisel verilerin işlenmesine dair bilgiye <a href=\"https://paribu.zendesk.com/api/v2/help_center/tr/articles/360015388459\">Aydınlatma Metni</a>’nden ulaşabilirsiniz.",
-        "content5": "Kişisel verilerin tarafımızca nasıl işlendiğine ve korunduğuna dair bilgiye <a href=\"https://paribu.zendesk.com/api/v2/help_center/tr/articles/115001572365\">Kişisel Verilerin İşlenmesi ve Korunması Politikası</a>’ndan ulaşabilirsiniz."
-      },
-      "title": "Paribu’da hesap\n\noluşturun",
-      "description": "Bilgilerinizin nasıl saklandığını ve kullanıldığını <a href=\"https://paribu.zendesk.com/api/v2/help_center/tr/articles/115001572365\">buradan</a> inceleyebilirsiniz."
-    }
-  },
-  "welcome": "Hojgeldin"
+  "asdasd": "asd"
 }
